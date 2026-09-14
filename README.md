@@ -129,8 +129,11 @@ words containing kanji do:
 
 `.github/workflows/build.yml` builds `dist/notes-en.pdf` and
 `dist/notes-ja.pdf` in the same TeX Live image on every push / PR and
-uploads them as a workflow artifact.  Pushing a tag `v*` attaches the PDFs
-to a GitHub release.
+uploads them as a workflow artifact.  On every push to `main` the PDFs are
+also force-pushed to the orphan branch `pdf`, so the latest build can be
+read in the browser at `https://github.com/<owner>/<repo>/blob/pdf/notes-en.pdf`
+(and `notes-ja.pdf`) without downloading anything.  Pushing a tag `v*`
+attaches the PDFs to a GitHub release.
 
 ## License
 
