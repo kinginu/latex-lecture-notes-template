@@ -39,7 +39,7 @@ sub ln_upmendex {
         return 0;
     }
     my $lang = (Cwd::getcwd() =~ m{/ja(/|$)}) ? 'ja' : 'en';
-    my @opts = ('-s', "lnotes-$lang.ist");
+    my @opts = ('-s', "$root/format/lnotes-$lang.ist");  # absolute: no kpathsea lookup
     push @opts, '-g' if $lang eq 'ja';
     return system('upmendex', @opts, @_);
 }
