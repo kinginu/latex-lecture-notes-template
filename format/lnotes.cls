@@ -221,6 +221,11 @@
 %% .latexmkrc, because latexmk -- not imakeidx -- runs the index processor.
 \RequirePackage{imakeidx}
 \makeindex[intoc,columns=2]
+%% Cross-references inside the index: \index{BTB|see{branch target buffer}}
+\ifln@ja
+  \renewcommand*{\seename}{→}
+  \renewcommand*{\alsoname}{→ 関連:}
+\fi
 
 %% How a term looks in the body text: italics in English, bold gothic in
 %% Japanese (Japanese fonts have no italics).
