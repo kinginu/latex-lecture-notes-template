@@ -132,8 +132,11 @@ words containing kanji do:
 uploads them as a workflow artifact.  On every push to `main` the PDFs are
 also force-pushed to the orphan branch `pdf`, so the latest build can be
 read in the browser at `https://github.com/<owner>/<repo>/blob/pdf/notes-en.pdf`
-(and `notes-ja.pdf`) without downloading anything.  Pushing a tag `v*`
-attaches the PDFs to a GitHub release.
+(and `notes-ja.pdf`) without downloading anything.  For a public repository,
+enable GitHub Pages on the `pdf` branch (Settings → Pages → Deploy from a
+branch: `pdf`, `/`) and the notes are served with an index page at
+`https://<owner>.github.io/<repo>/`.  Pushing a tag `v*` attaches the PDFs
+to a GitHub release.
 
 ## License
 
