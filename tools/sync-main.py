@@ -12,7 +12,8 @@ Only the regions between the marker lines are touched:
 
 Every chapter is included with \\IfFileExists, so the book builds while
 chapters are still being written.  Parts come from "parts" in the syllabus
-({"part": 1, "title": "...", "title_ja": "...", "first": <chapter number>}).
+({"part": 1, "title": "...", "title_ja": "...", "first": <chapter number>});
+a part page is printed once the part's first chapter exists.
 A bib/<slug>.bib file is listed once it exists.
 """
 import json
@@ -39,8 +40,9 @@ def chapter_block(lang):
     for l in lessons:
         p = parts.get(l["number"])
         if p:
+            # the part page appears once its first chapter exists
             title = p.get("title_ja", p["title"]) if lang == "ja" else p["title"]
-            lines.append(f"\\part{{{title}}}")
+            lines.append(f"\\IfFileExists{{lessons/{l['slug']}.tex}}{{\\part{{{title}}}}}{{}}")
         s = l["slug"]
         lines.append(f"\\IfFileExists{{lessons/{s}.tex}}{{\\subfile{{lessons/{s}}}}}{{}}")
     return lines

@@ -44,6 +44,7 @@ moved between machines without installing TeX.
 ├── bib/NN-slug.bib         per-chapter bibliography (optional)
 ├── references.bib          shared bibliography
 ├── glossary.tsv            terms: English key, Japanese term, reading, owning chapter
+├── book-preamble.tex       this book's own preamble (listing languages, macros)
 ├── docs/
 │   ├── style-guide.md      how to write a chapter           (generic)
 │   ├── workflow.md         how a book is produced            (generic)

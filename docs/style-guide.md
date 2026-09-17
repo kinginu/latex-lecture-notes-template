@@ -162,7 +162,8 @@ it goes to the margin.
 ## 5. Code
 
 - `lstlisting` with the language given in `book.md`; `numbers=none` for
-  short snippets.
+  short snippets.  Languages that `listings` does not know (LLVM IR, MLIR,
+  TableGen, …) are defined in `book-preamble.tex`, never in the class.
 - Lines ≤ 60 characters (the body is 120 mm wide).
 - `\end{lstlisting}` must start at column 0 (no indentation), even inside
   `example`: leading spaces before it add an empty last line to the listing.
