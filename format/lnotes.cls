@@ -336,16 +336,26 @@
 %% The \fullwidth minipage is wider than the measure on purpose, so the line
 %% holding it is overfull by exactly the gap plus the margin column; \hfuzz is
 %% raised inside the float so that intentional overflow is not reported.
+%% The vertical rule is drawn in the page background, so it would run
+%% through a wide float; \ln@putwide lays a white rectangle, reaching 7pt
+%% beyond the float (past the 6pt overhang of the rule), under the float body.
+%% The rectangle is smashed and has no width, so the layout is unchanged.
 \newlength{\ln@wideslack}
 \setlength{\ln@wideslack}{\dimexpr\marginparsep+\marginparwidth+1pt\relax}
+\newsavebox{\ln@widebox}
+\newcommand*{\ln@putwide}{%
+  \leavevmode\rlap{\smash{\color{white}%
+    \rule[\dimexpr-\dp\ln@widebox-7pt\relax]{\wd\ln@widebox}%
+      {\dimexpr\ht\ln@widebox+\dp\ln@widebox+14pt\relax}}}%
+  \usebox{\ln@widebox}}
 \newenvironment{widefigure}[1][tbp]{%
   \begin{figure}[#1]\ln@inboxtrue\hfuzz\ln@wideslack
-  \begin{minipage}{\fullwidth}\centering}%
-  {\end{minipage}\end{figure}}
+  \begin{lrbox}{\ln@widebox}\begin{minipage}{\fullwidth}\centering}%
+  {\end{minipage}\end{lrbox}\ln@putwide\end{figure}}
 \newenvironment{widetable}[1][tbp]{%
   \begin{table}[#1]\ln@inboxtrue\hfuzz\ln@wideslack
-  \begin{minipage}{\fullwidth}\centering}%
-  {\end{minipage}\end{table}}
+  \begin{lrbox}{\ln@widebox}\begin{minipage}{\fullwidth}\centering}%
+  {\end{minipage}\end{lrbox}\ln@putwide\end{table}}
 
 %% ------------------------------------------------------- code & algorithms
 \RequirePackage{listings}
