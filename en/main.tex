@@ -1,8 +1,13 @@
 % !TEX program = lualatex
 % English edition.  Keep the structure identical to ja/main.tex.
+% Class options: en|ja, lesson ("Lesson 3", default) | chapter ("Chapter 3"),
+% norule.  Keep the options identical in ja/main.tex (except the language).
 \documentclass[en]{lnotes}
 
 \addbibresource{\subfix{../references.bib}}
+% Per-chapter bibliographies, listed by tools/sync-main.py:
+% BEGIN bib (tools/sync-main.py)
+% END bib
 
 \title{Course Title}
 \subtitle{Lecture Notes}
@@ -16,8 +21,13 @@
 \tableofcontents
 
 \mainmatter
-\subfile{lessons/01-using-this-template}
-\subfile{lessons/02-lesson-skeleton}
+% Chapters, generated from docs/syllabus.json by tools/sync-main.py.
+% Each is included only once it exists, so the book builds while
+% chapters are still being written.
+% BEGIN chapters (tools/sync-main.py)
+\IfFileExists{lessons/01-using-this-template.tex}{\subfile{lessons/01-using-this-template}}{}
+\IfFileExists{lessons/02-lesson-skeleton.tex}{\subfile{lessons/02-lesson-skeleton}}{}
+% END chapters
 
 \backmatter
 \printbibliography

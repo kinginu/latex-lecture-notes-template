@@ -1,0 +1,22 @@
+{
+  "book": "Course Title",
+  "unit": "Lesson",
+  "source": "Where this chapter list comes from (e.g. the course's module list, the tutorial's table of contents), and what was left out.",
+  "parts": [],
+  "lessons": [
+    {
+      "number": 1,
+      "slug": "01-using-this-template",
+      "title": "Using this template",
+      "title_ja": "このテンプレートの使い方",
+      "units": ["Margin notes", "Terms and the index", "Figures, tables and code", "Bilingual writing"]
+    },
+    {
+      "number": 2,
+      "slug": "02-lesson-skeleton",
+      "title": "Lesson skeleton",
+      "title_ja": "章の雛形",
+      "units": []
+    }
+  ]
+}

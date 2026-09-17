@@ -1,23 +1,50 @@
+% en/lessons/02-lesson-skeleton.tex の日本語版．英語版と節・ラベル・
+% 余白ノートを完全に対応させる．規則: docs/style-guide.md．
 \documentclass[../main.tex]{subfiles}
 \begin{document}
 
 \chapter{章の雛形}
 \lessoninfo{
-  video={Lesson N},
-  textbook={},
-  keywords={},
+  video={Lesson 2，動画 1--12},
+  textbook={H\&P \cite{hennessy2017} 第1章},
+  keywords={最初の用語，次の用語},
 }
 
+2〜4文で，この章で扱う内容，その意義，前の章とのつながりを述べる．
+
 \section{最初のトピック}
+\label{sec:l02-first}
 
-本文．\source{Lesson N，動画 3．}
+節の最初の文．\source{Lesson 2，動画 1--5；H\&P §1.2．}
+\term[さいしょのようご]{最初の用語}[first term]は，資料が定義する箇所で定義する．
+説明は資料の順序に従い，概念が何であるか，なぜ必要か，どう使われるかを述べる．
 
-\begin{keypoint}
-  この節で覚えておくべき一点．
-\end{keypoint}
+\begin{definition}[最初の用語]
+  \label{def:l02-first}
+  定義の正確な記述．
+\end{definition}
+
+\begin{example}
+  \label{ex:l02-first}
+  独自の数値を用いた計算例．\margin{例で使う記号と単位．}
+\end{example}
 
 \section{次のトピック}
+\label{sec:l02-second}
 
-本文．
+\cref{sec:l02-first}を踏まえた本文．\source{Lesson 2，動画 6--12．}
+余白の項目は，それが補う文の隣に置き，短い文章の範囲には多くても3つ程度に
+とどめる．
+
+経験則はヒントにする．\tip{経験則．}余白を読み飛ばしても議論を追えるように，
+論証は本文で続ける．3行を超える補足は番号付きの注にする．\sidenote{設計の
+理由や，実在する実装の名前とその出典．}
+
+\begin{keypoint}[章のまとめ]
+  \begin{itemize}
+    \item 最初の節で覚えておくべき一点．
+    \item 次の節で覚えておくべき一点．
+  \end{itemize}
+\end{keypoint}
 
 \end{document}

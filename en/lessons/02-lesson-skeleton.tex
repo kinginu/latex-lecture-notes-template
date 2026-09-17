@@ -1,23 +1,56 @@
+% Copy to en/lessons/NN-slug.tex (and the Japanese version to
+% ja/lessons/NN-slug.tex), add the chapter to docs/syllabus.json and run
+% tools/sync-main.py.  Rules: docs/style-guide.md.
 \documentclass[../main.tex]{subfiles}
 \begin{document}
 
 \chapter{Lesson skeleton}
 \lessoninfo{
-  video={Lesson N},
-  textbook={},
-  keywords={},
+  video={Lesson 2, videos 1--12},
+  textbook={H\&P \cite{hennessy2017} ch.~1},
+  keywords={first term, second term},
 }
 
+Two to four sentences: what this chapter covers, why it matters, and how it
+continues the previous chapter.
+
 \section{First topic}
+\label{sec:l02-first}
 
-Body text.\source{Lecture N, video 3.}
+The first sentence of the section.\source{Lesson 2, videos 1--5; H\&P §1.2.}
+A \term{first term}[最初の用語] is defined where the source defines it.
+The explanation follows the order of the source: what the concept is, why
+it is needed, and how it is used.
 
-\begin{keypoint}
-  The one thing to remember from this section.
-\end{keypoint}
+\begin{definition}[First term]
+  \label{def:l02-first}
+  A precise statement of the definition.
+\end{definition}
+
+\begin{example}
+  \label{ex:l02-first}
+  A worked example with our own numbers.\margin{Notation and units used
+  in the example.}
+\end{example}
 
 \section{Second topic}
+\label{sec:l02-second}
 
-Body text.
+Body text that builds on \cref{sec:l02-first}.\source{Lesson 2, videos
+6--12.}  Each margin item sits next to the sentence it supports, and a
+short run of text carries at most about three of them.
+
+A rule of thumb goes into a tip.\tip{A rule of thumb.}  The argument
+continues in the body, so that a reader who skips the margin still follows
+it.  A longer aside that needs more than three lines goes into a numbered
+note.\sidenote{Why the design exists, or a named real-world
+implementation, with its source.}
+
+\begin{keypoint}[Lesson summary]
+  \begin{itemize}
+    \item The one thing to remember from the first section.
+    \item The one thing to remember from the second section.
+  \end{itemize}
+\end{keypoint}
 
 \end{document}

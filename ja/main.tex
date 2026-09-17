@@ -3,6 +3,9 @@
 \documentclass[ja]{lnotes}
 
 \addbibresource{\subfix{../references.bib}}
+% 章ごとの文献ファイル（tools/sync-main.py が生成）:
+% BEGIN bib (tools/sync-main.py)
+% END bib
 
 \title{講義名}
 \subtitle{講義ノート}
@@ -16,8 +19,12 @@
 \tableofcontents
 
 \mainmatter
-\subfile{lessons/01-using-this-template}
-\subfile{lessons/02-lesson-skeleton}
+% 章の一覧．docs/syllabus.json から tools/sync-main.py が生成する．
+% 存在する章だけが取り込まれるので，執筆途中でも本全体をビルドできる．
+% BEGIN chapters (tools/sync-main.py)
+\IfFileExists{lessons/01-using-this-template.tex}{\subfile{lessons/01-using-this-template}}{}
+\IfFileExists{lessons/02-lesson-skeleton.tex}{\subfile{lessons/02-lesson-skeleton}}{}
+% END chapters
 
 \backmatter
 \printbibliography
