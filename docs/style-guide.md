@@ -32,6 +32,12 @@ is in [`workflow.md`](workflow.md).
   products and later history that the source unit does not discuss (what
   shipped after the lecture, how a vendor implements the idea) belong in a
   `\margin` or `\sidenote`, not in the body.
+- **Lecture vs paper.**  Where the source simplifies a result of the paper
+  or documentation it cites (a rounded number, a dropped condition, an
+  older version of the design), the body keeps the source's statement and a
+  `\caution` beside it says what the paper states ("lecture vs paper:
+  the paper measures … under …").  Do not silently replace the source's
+  statement, and do not keep it without the caution.
 - **No graded or restricted material.**  For a course: never reproduce quiz,
   exam, homework or project questions, their numbers or their answers
   (honor code); the concept a quiz tests may be explained with our own
@@ -111,6 +117,18 @@ how it connects to the previous chapter.>
 - Code identifiers (`mlir::Operation`, `pthread_create`) are set with
   `\texttt{}` (or `\lstinline`) and indexed with a plain `\index{}` if at all;
   they are not glossary terms.
+- No line break inside the braces of a Japanese `\term` argument (the
+  word, its reading, or the Japanese gloss in the English edition): the
+  break becomes a space in the gloss and in the index key.  Break the
+  source line before or after the `\term`.
+- No `\term` inside `\margin`, `\sidenote`, `\tip`, `\caution` or
+  `\source`: a margin note cannot carry its own gloss.  Define the term in
+  the body; the note may use `\term*` or plain text.
+- `\source` names the part of the source and the reference only; words
+  about the delivery format ("visual metaphor", "in this video", 比喩,
+  この動画) never appear in it.
+- These rules, the label and listing rules and the `\term` ownership are
+  checked by `tools/chapter-lint.py <slug>`.
 
 ### 3.1 What goes in the margin column
 
@@ -172,7 +190,8 @@ it goes to the margin.
   "Example"/"Note".
 - Cross-references: `\cref{…}` (a list or range such as
   `\cref{sec:a,sec:b,sec:c}` is fine in both editions); to another chapter
-  in prose: "Lesson 7" (EN) / "第7章" (JA), numbers from `syllabus.json`.
+  in prose: "Lesson 7" (EN) / "第7章" (JA), numbers from `syllabus.json`,
+  and only to a chapter that actually treats the topic.
   Japanese chapters do not use `\Cref`.
 - Figures shared by both editions: `figures/lNN-<name>.tex`, pure TikZ,
   language-dependent text via `\iflangja{日本語}{English}`, must fit the

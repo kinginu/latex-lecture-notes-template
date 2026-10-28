@@ -65,6 +65,20 @@ jobs:
           done
           ls -l dist/
 
+      # The logs feed tools/log-summary.py (overfull boxes, undefined refs)
+      # and tools/layout-report.py (which maps pages to chapters by the .toc).
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: |
+            en/build/main.log
+            ja/build/main.log
+            en/build/main.toc
+            ja/build/main.toc
+          if-no-files-found: warn
+
       - name: Generate index.html for GitHub Pages
         env:
           PAGES_SUBTITLE: ${{ vars.PAGES_SUBTITLE }}
