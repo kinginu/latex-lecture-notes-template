@@ -18,6 +18,9 @@ LuaLaTeX in Docker.  Read before writing or reviewing anything:
   machine; the script waits for a lock).
 - `tools/layout-diff.sh <en|ja>` — page-by-page text diff against the
   published PDF, after a class or layout change.
+- `tools/glossary-check.py` / `tools/parity-check.py [--lint]` — `\term`
+  use against `glossary.tsv`; EN/JA structure, margin anchors and
+  delivery-format wording.  Run before reviewing or proofreading.
 - `tools/sync-main.py` — regenerate the chapter and bibliography lists in
   both `main.tex` after changing `docs/syllabus.json` or adding `bib/*.bib`.
 - `tools/commit-lesson.sh <slug>` / `tools/commit-pass.sh "<subject>" …` —
@@ -30,7 +33,7 @@ LuaLaTeX in Docker.  Read before writing or reviewing anything:
   homework and project content).
 - `format/` is shared by every book.  In a book repository never edit it;
   report the needed change.  Class changes are made in the template
-  repository and copied to each book (`docs/workflow.md` §4).
+  repository and copied to each book (`docs/workflow.md` §5).
 - Never force-push, reset or rewrite history.  Commit trailers come from
   `.git/commit-trailers`.
 - Whole-book builds need ~2.5 GB: never run two at once, and keep chapter
