@@ -38,6 +38,7 @@ KANJI = re.compile(r"[\u3400-\u9fff\uf900-\ufaff]")
 def norm(s):
     """Plain comparable form of a TeX string or a glossary cell."""
     s = s.replace("\\slash", "/").replace("\\&", "&").replace("~", " ")
+    s = re.sub(r"\\(?:allowbreak|linebreak|nobreak)(?![A-Za-z])|\\-", "", s)
     s = re.sub(r"\\(?:textit|textbf|emph|texttt|textrm|mbox)\s*\{([^{}]*)\}", r"\1", s)
     s = s.replace("$", "").replace("{", "").replace("}", "")
     s = re.sub(r"\\[,;: ]", " ", s)

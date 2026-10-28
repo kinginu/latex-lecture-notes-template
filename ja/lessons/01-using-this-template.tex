@@ -45,13 +45,13 @@
   実行時間のうち割合 $f$ の部分を $s$ 倍速くしたとき，全体の高速化率は
   \begin{equation}
     S = \frac{1}{(1-f) + f/s}
-    \label{eq:amdahl}
+    \label{eq:l01-amdahl}
   \end{equation}
   で与えられる．
 \end{definition}
 
 \begin{example}
-  $f = 0.9$，$s \to \infty$ のとき，\cref{eq:amdahl} より $S = 10$ となる．
+  $f = 0.9$，$s \to \infty$ のとき，\cref{eq:l01-amdahl} より $S = 10$ となる．
   手を付けなかった \SI{10}{\percent} が達成可能な高速化の上限を決める．
 \end{example}
 
@@ -69,24 +69,24 @@
 
 \begin{marginfigure}
   \begin{tikzpicture}[scale=0.6]
-    \draw[->] (0,0) -- (4,0) node[right,font=\tiny] {$f$};
-    \draw[->] (0,0) -- (0,3) node[above,font=\tiny] {$S$};
+    \draw[->] (0,0) -- (4,0) node[right,font=\scriptsize] {$f$};
+    \draw[->] (0,0) -- (0,3) node[above,font=\scriptsize] {$S$};
     \draw[thick,ln-accent] plot[domain=0:3.6,samples=40] (\x,{1/(1-\x/4+0.001)*0.7});
   \end{tikzpicture}
   \caption{余白に置いた図（\texttt{marginfigure}）．}
-  \label{fig:margin}
+  \label{fig:l01-margin}
 \end{marginfigure}
 
-小さな図は余白に置く（\cref{fig:margin}）．通常の図は標準の \verb|figure|
+小さな図は余白に置く（\cref{fig:l01-margin}）．通常の図は標準の \verb|figure|
 環境を，幅の広い図は本文と余白にまたがる \verb|widefigure| を使う
-（\cref{fig:wide}）．日英で共有する図は \texttt{figures/} に置き，
+（\cref{fig:l01-wide}）．日英で共有する図は \texttt{figures/} に置き，
 ラベルは \verb|\iflangja| で切り替える．
 
 \begin{figure}[htbp]
   \centering
   \input{figures/pipeline-stages}
   \caption{古典的な5段パイプライン（共有 TikZ ソース）．}
-  \label{fig:pipeline}
+  \label{fig:l01-pipeline}
 \end{figure}
 
 \begin{widefigure}[htbp]
@@ -100,7 +100,7 @@
     \bottomrule
   \end{tabular}
   \caption{本文と余白にまたがる幅広フロート（\texttt{widefigure}）．}
-  \label{fig:wide}
+  \label{fig:l01-wide}
 \end{widefigure}
 
 コードには \verb|listings| を使う．

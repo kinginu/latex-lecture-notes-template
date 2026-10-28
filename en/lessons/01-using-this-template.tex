@@ -46,12 +46,12 @@ repeated page numbers.  Terms can be nested: \term{speedup}[高速化率] and
   faster, the overall speedup is
   \begin{equation}
     S = \frac{1}{(1-f) + f/s}.
-    \label{eq:amdahl}
+    \label{eq:l01-amdahl}
   \end{equation}
 \end{definition}
 
 \begin{example}
-  If $f = 0.9$ and $s \to \infty$, \cref{eq:amdahl} gives $S = 10$: the
+  If $f = 0.9$ and $s \to \infty$, \cref{eq:l01-amdahl} gives $S = 10$: the
   untouched \SI{10}{\percent} bounds the achievable speedup.
 \end{example}
 
@@ -69,17 +69,17 @@ repeated page numbers.  Terms can be nested: \term{speedup}[高速化率] and
 
 \begin{marginfigure}
   \begin{tikzpicture}[scale=0.6]
-    \draw[->] (0,0) -- (4,0) node[right,font=\tiny] {$f$};
-    \draw[->] (0,0) -- (0,3) node[above,font=\tiny] {$S$};
+    \draw[->] (0,0) -- (4,0) node[right,font=\scriptsize] {$f$};
+    \draw[->] (0,0) -- (0,3) node[above,font=\scriptsize] {$S$};
     \draw[thick,ln-accent] plot[domain=0:3.6,samples=40] (\x,{1/(1-\x/4+0.001)*0.7});
   \end{tikzpicture}
   \caption{A figure in the margin (\texttt{marginfigure}).}
-  \label{fig:margin}
+  \label{fig:l01-margin}
 \end{marginfigure}
 
-Small figures go in the margin (\cref{fig:margin}); normal figures use the
+Small figures go in the margin (\cref{fig:l01-margin}); normal figures use the
 standard \verb|figure| environment; wide figures use \verb|widefigure|,
-which spans the body and the margin column (\cref{fig:wide}).  Figures shared
+which spans the body and the margin column (\cref{fig:l01-wide}).  Figures shared
 between the two editions live in \texttt{figures/} and switch their labels
 with \verb|\iflangja|.
 
@@ -87,7 +87,7 @@ with \verb|\iflangja|.
   \centering
   \input{figures/pipeline-stages}
   \caption{A classic five-stage pipeline (shared TikZ source).}
-  \label{fig:pipeline}
+  \label{fig:l01-pipeline}
 \end{figure}
 
 \begin{widefigure}[htbp]
@@ -101,7 +101,7 @@ with \verb|\iflangja|.
     \bottomrule
   \end{tabular}
   \caption{A wide float spanning body and margin (\texttt{widefigure}).}
-  \label{fig:wide}
+  \label{fig:l01-wide}
 \end{widefigure}
 
 Code uses \verb|listings|:
