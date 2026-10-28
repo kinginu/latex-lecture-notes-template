@@ -26,6 +26,8 @@ jobs:
         run: make dist
 
       - name: Generate index.html for GitHub Pages
+        env:
+          PAGES_SUBTITLE: ${{ vars.PAGES_SUBTITLE }}
         run: sh .github/scripts/pdf-index.sh "${{ github.event.repository.name }}" "${{ github.server_url }}/${{ github.repository }}" "${{ github.sha }}"
 
       - uses: actions/upload-artifact@v4

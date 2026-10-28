@@ -22,6 +22,16 @@ is in [`workflow.md`](workflow.md).
   "you", rhetorical questions.  The textbook "we" ("we now compute …") is
   fine.  A named law, principle or design rule that the source introduces is
   content and stays, stated precisely.
+- **The chapter speaks for itself.**  Body text never refers to the
+  delivery medium ("the lecture", "the video", "the slides" / 「講義では」
+  「動画では」); write "this chapter" (「本章」) or state the content
+  directly.  Where the source's own wording matters (a term it uses
+  differently from the textbook), say so in a `\caution`; the `\source`
+  note is where the lecture or video is named.
+- **Detail beyond the unit goes to the margin.**  Vendor specifics, named
+  products and later history that the source unit does not discuss (what
+  shipped after the lecture, how a vendor implements the idea) belong in a
+  `\margin` or `\sidenote`, not in the body.
 - **No graded or restricted material.**  For a course: never reproduce quiz,
   exam, homework or project questions, their numbers or their answers
   (honor code); the concept a quiz tests may be explained with our own
@@ -126,14 +136,24 @@ it goes to the margin.
 | Small illustration | `marginfigure` | state diagram, small plot |
 
 - **Density limit**: at most ~3 margin items within a short run of text;
-  the checker reports "margin notes moved down" — keep it at 0–2 per
-  chapter.
+  the checker reports "margin notes moved down".  A new chapter keeps it at
+  0–2.  During a pass over finished chapters (e.g. the proofreading pass,
+  `workflow.md` §4) a chapter's count must never rise above its count
+  before the pass (`tools/chapter-check.sh … --max-moved <baseline>`).  A
+  chapter that stays above 2 for a documented reason is listed, with the
+  reason, in `book.md`.
 - **Real-world numbers are welcome even when the source does not give
   them** — they are what makes the notes usable later.  Name where the
   number comes from in the same note or an adjacent `\source` (vendor
   manual, textbook figure, paper, official documentation), so that source
   content and added context stay distinguishable.  Verify every number;
   keep them few, current and uncontroversial; never invent one.
+- **One number per fact across the book.**  A real-world number that
+  appears in more than one chapter is identical everywhere, with the same
+  source: in cs6290-notes the Skylake branch-misprediction penalty is
+  16–20 cycles and its L3 latency 44 cycles in every chapter that mentions
+  them.  When a pass corrects such a number, it corrects every occurrence
+  (`grep -rn` both editions).
 - Do not park body-level reasoning in the margin: if a reader needs it to
   follow the argument, it belongs in the body.
 
@@ -142,6 +162,12 @@ it goes to the margin.
 - Labels are unique across the whole book and carry the chapter number:
   `sec:l04-btb`, `fig:l04-btb`, `tab:l04-…`, `eq:l04-…`, `def:l04-…`,
   `ex:l04-…`, `lst:l04-…`.  EN and JA use the **same** labels.
+- **Terms at first use.**  A term that `glossary.tsv` assigns to a chapter
+  (column `lesson`) is `\term`ed at its first use in that chapter, in both
+  editions; other chapters do not `\term` it again (§3).
+  `tools/glossary-check.py` lists terms that are missing, re-`\term`ed
+  elsewhere, absent from the glossary, or carry a gloss or reading that
+  differs from it.
 - Plain `\label{…}` inside `example`/`note` is enough — `\cref` prints
   "Example"/"Note".
 - Cross-references: `\cref{…}` (a list or range such as
@@ -182,6 +208,12 @@ it goes to the margin.
 - `\lessoninfo` keywords separated by `，`; `video={Lesson 4，動画 1--48}`;
   key point summary title `[章のまとめ]`; other chapters as `第N章`.
 - Numbers, units, math and code identical to the English edition.
+- **Parity is checked mechanically**: the ordered sequence of commands of
+  the two editions — sections, labels, `\input`, `\source`, `\margin`,
+  `\sidenote`, `\tip`, `\caution`, `\term`, environments — must be
+  identical (`tools/parity-check.py`).  Each margin item is anchored at the
+  **same sentence** in both editions; a difference kept for layout is
+  marked with a `%` comment next to the item (`workflow.md` §4).
 
 ## 7. Checking a chapter
 
@@ -192,7 +224,8 @@ tools/chapter-check.sh en 04-branches     # or ja
 Required before a chapter is done: 0 errors, 0 undefined references
 (references to other chapters are listed separately and are fine), 0
 undefined citations, 0 multiply-defined labels, 0 missing glyphs, 0 overfull
-boxes > 3 pt, at most 2 "margin notes moved down".  Then **read every
+boxes > 3 pt, at most 2 "margin notes moved down" (during a pass: at most
+the chapter's count before it, §3.1).  Then **read every
 rendered page** `.png/<lang>-<slug>-NN.png`: a clean log does not mean a
 correct page (a font-loading bug once printed `\underbrace` as black boxes
 with no warning at all).
