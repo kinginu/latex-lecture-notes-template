@@ -80,6 +80,33 @@ make docker-shell        # a shell inside the container
 Inside the container (or on any machine with TeX Live 2025) the same targets
 work without the `docker-` prefix: `make en`, `make ja`, `make all`, `make clean`.
 
+### Print editions
+
+The A4 PDF is the screen edition.  `print=<size>` (class option, set by
+`make`) builds a compact two-sided edition of the same sources: the margin
+column moves to the outer side and everything is the A4 design scaled by
+`scale` (body font 10 pt × scale; `scale=` overrides it).  Figures and
+tables are drawn at the A4 sizes, scaled, and shrunk to the measure only if
+still too wide (logged as `lnotes-fit:`).  Chapters need no changes.
+
+| `print=` | trim (mm) | body + margin column (mm) | scale | body font |
+|---|---|---|---|---|
+| `a5` | 148 × 210 | 86 + 35 | 0.7 | 7 pt |
+| `b5` | 182 × 257 | 106 + 43.5 | 0.85 | 8.5 pt |
+| `b6` | 128 × 182 | 73 + 32 | 0.65 | 6.5 pt |
+| `shinsho` (新書判) | 113 × 176 | 63 + 27 | 0.65 | 6.5 pt |
+
+```sh
+make docker-en-a5        # -> en/build/main-a5.pdf   (also ja-a5, en-b6, ...)
+make docker-print-b6     # both languages -> dist/notes-<lang>-b6.pdf
+make docker-print        # every size (a5 b6 shinsho b5)
+tools/book-check.sh en --print a5
+```
+
+Legibility: below `scale=0.6` the text is not readable, and figure labels
+already fall to about 4.5 pt at 0.65.  CI builds A4, A5, B6 and 新書判 and
+lists the print samples, per size, on the Pages index; B5 is `make` only.
+
 ### VS Code
 
 Open the folder and choose **Reopen in Container**; LaTeX Workshop is
@@ -156,8 +183,9 @@ reviews → fix → translate → check → commit, per chapter),
 
 Class options: `en` (default) / `ja`; `lesson` (default, "Lesson 3") /
 `chapter` ("Chapter 3"; the Japanese edition always prints 第3章);
-`norule` (no vertical rule); anything else is passed to KOMA-Script
-`scrbook` (e.g. `fontsize=11pt`).
+`norule` (no vertical rule); `print=a4|a5|b5|b6|shinsho` and `scale=<factor>`
+(see *Print editions*); `fontsize=` (default 10pt, or 10pt × scale);
+anything else is passed to KOMA-Script `scrbook`.
 
 ### Index readings (Japanese)
 
@@ -183,8 +211,10 @@ words containing kanji do:
 ## CI
 
 `.github/workflows/build.yml` builds `dist/notes-en.pdf` and
-`dist/notes-ja.pdf` in the same TeX Live image on every push / PR and
-uploads them as a workflow artifact.  On every push to `main` the PDFs are
+`dist/notes-ja.pdf` in the same TeX Live image on every push / PR, and in
+parallel the A5, B6 and 新書判 print samples (`dist/notes-<lang>-<size>.pdf`;
+a failed print size does not block the A4 editions); they are uploaded as
+workflow artifacts `pdf-<size>`.  On every push to `main` the PDFs are
 also force-pushed to the orphan branch `pdf`, so the latest build can be
 read in the browser at `https://github.com/<owner>/<repo>/blob/pdf/notes-en.pdf`
 (and `notes-ja.pdf`) without downloading anything.  For a public repository,
@@ -230,6 +260,9 @@ yours; choose a license for the content in your course repository.
   ページ画像化、`tools/book-check.sh <en|ja>` で本全体（同時に 1 冊だけ）、
   `tools/layout-diff.sh <en|ja>` で公開中の PDF とのページ単位の差分を
   確認できます。
+- 印刷用の小型版（両面・余白列は小口側）: `make docker-print-a5`
+  （`a5`, `b6`, `shinsho` = 新書判, `b5`）。A4 の版面を縮小するだけで、
+  章ファイルの変更は不要です（*Print editions* 参照）。
 - Claude Code 用に `CLAUDE.md` とワークフロー（`.claude/workflows/`）を
   同梱しています。
 - 講義以外の資料（ドキュメント、チュートリアル）を扱う本では

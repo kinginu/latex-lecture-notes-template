@@ -231,3 +231,10 @@ book repository (see `workflow.md`, *Class changes*).
   branch only — the English output must not change.
 - **Figure text size.**  Nothing smaller than `\scriptsize` in a figure; if a
   figure only fits with `\tiny`, redesign it.
+- **Print editions.**  Layout is judged on the A4 screen edition only.
+  `print=a5|b5|b6|shinsho` (`make en-a5`, `tools/book-check.sh en --print a5`)
+  scales that design to a two-sided compact page (body font 10 pt × `scale`:
+  0.7, 0.85, 0.65, 0.65; `scale=` overrides); figures and tables are scaled
+  and, if still too wide, shrunk to the measure (`lnotes-fit:` in the log).
+  Never edit a chapter for a print size.  Below `scale=0.6` text is not
+  readable; figure labels fall to about 4.5 pt.
