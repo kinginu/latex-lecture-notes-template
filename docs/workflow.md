@@ -21,11 +21,21 @@ because skipping it let real defects through.
    (`chapter` option for "Chapter 3" instead of "Lesson 3"), delete the two
    sample chapters and their `glossary.tsv` rows, and run
    `tools/sync-main.py`.
-4. Replace `README.md` with the book's own (title, links to the PDFs,
-   status table, content license).  For a public repository enable GitHub
-   Pages on the `pdf` branch (Settings → Pages); CI publishes both PDFs
-   there on every push to `main`.
-5. Write `glossary.tsv` **before** the chapters: one row per concept with
+4. Replace `README.md` with the book's own: title, links to the PDFs,
+   status table, and a licence section that keeps the two licences apart
+   (`format/` and the build files are MIT from the template; the notes in
+   `en/`, `ja/` and `figures/` need their own line, e.g. "© <holder>,
+   CC BY-NC-SA 4.0").  Put the copyright holder of the book into
+   `LICENSE`.
+5. Publishing: GitHub Pages is **not** enabled by the template; for a
+   public repository enable it by hand on the `pdf` branch (Settings →
+   Pages → Deploy from a branch: `pdf`, `/`).  CI publishes both PDFs there
+   on every push to `main`.  The index page shows the repository name and
+   a subtitle (default "Lecture notes — English / 日本語"); set the
+   repository variable `PAGES_SUBTITLE` (Settings → Secrets and variables
+   → Actions → Variables) to change it
+   (`.github/scripts/pdf-index.sh`).
+6. Write `glossary.tsv` **before** the chapters: one row per concept with
    the chapter that first defines it (`lesson`), the Japanese term and its
    reading.  Term ownership is what keeps 20 independently written chapters
    from defining the same term five times.
@@ -33,7 +43,7 @@ because skipping it let real defects through.
 ## 2. Write chapters
 
 Each chapter goes through five stages; chapters are independent and can
-run in parallel (see §5 for how many).
+run in parallel (see §6 for how many).
 
 | Stage | What happens | Output |
 |---|---|---|
@@ -64,11 +74,69 @@ After the last chapter, one edition or one concern at a time:
    layout in the chapter sources (style guide §8).  Commit each edition with
    `COMMIT_SCOPE=<lang> tools/commit-pass.sh "<subject>" "<body>"`.
    Defects that only the class can fix are collected, not patched locally
-   (§4).
+   (§5).
 
 Each pass commits with `tools/commit-pass.sh`.
 
-## 4. Class changes
+## 4. Proofreading pass
+
+A finished book is read once more, chapter by chapter, for technical
+correctness, scope, EN/JA parity and style-guide compliance.  The model is
+the pass recorded in cs6290-notes commit `2e0ec80` (22 chapters, about 110
+findings applied); its commit message is the template for the one below.
+
+1. **Mechanical first step.**  Before any reader starts, run
+   `tools/glossary-check.py` (term ownership, glosses, readings against
+   `glossary.tsv`) and `tools/parity-check.py --lint` (ordered structure and
+   margin anchors of the two editions, delivery-format wording in the
+   body).  Their output goes to the reviewers with the chapters it concerns;
+   a reported item is a candidate, not yet a finding.
+2. **Review.**  Each reviewer takes two chapters, both editions, with their
+   figures and bibliography, and reports findings only — reviewers never
+   edit.  Every finding has:
+   - the location `file:line`;
+   - a severity: **ERROR** (wrong fact, number or figure), **MISMATCH**
+     (EN and JA differ: omitted, added or mistranslated text, an item
+     anchored at a different sentence), **SCOPE** (beyond the source unit or
+     in the wrong place, e.g. vendor detail in the body), **STYLE** (a
+     style-guide rule is broken), **NIT** (typo, punctuation);
+   - the quoted text, and the concrete replacement **in both languages**.
+3. **Vetting.**  A lead checks every finding (recomputes, looks the fact
+   up), drops those that cannot be verified or are only a matter of taste,
+   and hands the accepted list to an implementer.
+4. **Applying.**  The implementer applies the list keeping the two editions
+   structurally identical (style guide §6), runs `tools/chapter-check.sh`
+   for both editions of every touched chapter and reads the rendered pages
+   that changed.
+5. **Layout rules.**
+   - The "margin notes moved down" count of a chapter must not exceed its
+     count before the pass.  Measure the baseline by building the `HEAD`
+     version under a temporary slug
+     (`git show HEAD:en/lessons/NN-slug.tex > en/lessons/NN-slug-base.tex`,
+     `tools/chapter-check.sh en NN-slug-base --no-render`; the same for
+     `ja`), then delete the temporary `.tex`, its
+     `<lang>/lessons/build/NN-slug-base.*` and `.png/<lang>-NN-slug-base*`
+     files; check the edited chapter with
+     `tools/chapter-check.sh en NN-slug --max-moved <baseline>`.
+   - On a touched page no margin note may run below the text block.
+   - Fix a crowded margin by shortening a note or anchoring it one
+     sentence earlier or later — in **both** editions.  Where the editions
+     must keep different anchors for layout, mark the difference with a
+     `%` comment next to the item in the edition that deviates
+     (`parity-check.py` still reports it).
+6. **Finish.**  `tools/book-check.sh` for each edition, then one commit
+   (`tools/commit-pass.sh`) whose message lists: facts corrected (per
+   chapter, what was wrong and what it is now), scope moves, margin sources
+   added or aligned, EN/JA parity fixes, index additions, layout (moved-down
+   counts against the baseline, chapters that keep a deliberate
+   difference) and the build totals of both editions (pages, errors,
+   undefined references and citations, multiply-defined labels, missing
+   glyphs, overfull boxes, index warnings).
+
+The `notes-proofread` workflow (§8) runs step 2 and returns the findings
+grouped by chapter; steps 3–6 stay with the lead.
+
+## 5. Class changes
 
 `format/` is shared by every book made from the template and must stay
 identical everywhere.
@@ -86,7 +154,7 @@ Loading order matters in the class: `amsmath` and `mathtools` must be
 loaded before `unicode-math`, or `\underbrace` prints black boxes while the
 log stays clean.  This is why every stage reads the rendered pages.
 
-## 5. Machine resources
+## 6. Machine resources
 
 - A chapter build needs ~1.5 GB (`CHAPTER_MEM`), a whole-book build ~2.5 GB
   (`BOOK_MEM`) plus rendering.  `tools/book-check.sh` lets only one book
@@ -100,7 +168,7 @@ log stays clean.  This is why every stage reads the rendered pages.
 - Long runs belong in a terminal multiplexer that survives the editor
   (e.g. a systemd user service running tmux).
 
-## 6. Git and publishing
+## 7. Git and publishing
 
 - Commit only through `tools/commit-lesson.sh` and `tools/commit-pass.sh`;
   they stage the content directories only and serialize concurrent commits.
@@ -111,7 +179,7 @@ log stays clean.  This is why every stage reads the rendered pages.
   (and Pages) and attaches them to `v*` releases; a newer push cancels a
   running build.
 
-## 7. With Claude Code
+## 8. With Claude Code
 
 The stages above exist as saved workflows in `.claude/workflows/`
 (run them by name, e.g. "run the notes-chapters workflow for chapters
@@ -125,6 +193,7 @@ the repository it runs in.
 | `notes-margins` | `{chapters: [...]}` | §3.1 margin enrichment |
 | `notes-integration` | — | §3.2 terminology and §3.3 cross-references |
 | `notes-visual-qa` | `{langs: ["en", "ja"]}` | §3.4, one edition after the other |
+| `notes-proofread` | `{chapters: [...], perReviewer?: 2}` | §4 step 2: reviewers, two chapters each; returns the findings for vetting |
 
 Before running them, write the commit trailers to `.git/commit-trailers`.
 A workflow that is interrupted part-way is best continued by looking at

@@ -66,8 +66,8 @@ intended for on-screen reading).
 
 ```sh
 # 1. Create a course repository from this template
-gh repo create cs6290-notes --template <owner>/latex-lecture-notes-template --private --clone
-cd cs6290-notes
+gh repo create <name>-notes --template <owner>/latex-lecture-notes-template --private --clone
+cd <name>-notes
 
 # 2. Build the image once (~3 GB download), then build both editions
 make docker-build
@@ -95,7 +95,17 @@ repo's `.latexmkrc`.
 
 Follow [`docs/workflow.md`](docs/workflow.md) §1: fill in `docs/book.md`
 and `docs/syllabus.json`, set the title block, run `tools/sync-main.py`,
-write `glossary.tsv`, replace this README.
+write `glossary.tsv`, replace this README.  Items that are easy to miss:
+
+- the book's README states the **content licence** separately: `format/`
+  and the build files are MIT (from the template), the notes themselves
+  need their own line, e.g. "© <holder>, CC BY-NC-SA 4.0";
+- the copyright holder in `LICENSE`;
+- the subtitle of the GitHub Pages index (repository variable
+  `PAGES_SUBTITLE`, read by `.github/scripts/pdf-index.sh`; default
+  "Lecture notes — English / 日本語");
+- GitHub Pages is not switched on by the template: enable it by hand on
+  the `pdf` branch (see *CI* below).
 
 ### Writing a chapter
 
@@ -122,6 +132,8 @@ write `glossary.tsv`, replace this README.
 | `tools/sync-main.py [--check]` | chapter and bibliography lists of both `main.tex` from the syllabus |
 | `tools/commit-lesson.sh <slug>` | commit and push one finished chapter |
 | `tools/commit-pass.sh "<subject>" …` | commit and push a cross-chapter pass (`COMMIT_SCOPE=en\|ja`) |
+| `tools/glossary-check.py [--lang en\|ja\|both] [--lesson NN]` | `\term` use against `glossary.tsv`: ownership, missing terms, glosses, readings |
+| `tools/parity-check.py [--lesson NN] [--lint]` | EN/JA structure and margin anchors per chapter; `--lint` flags "the lecture", "you", 講義では … in the body |
 
 Memory limits (`CHAPTER_MEM`, `BOOK_MEM`), the image name (`LNOTES_IMAGE`)
 and commit trailers (`.git/commit-trailers`) are described in
@@ -132,8 +144,9 @@ and commit trailers (`.git/commit-trailers`) are described in
 `CLAUDE.md` and `.claude/workflows/` make a book repository ready for
 Claude Code: `notes-glossary`, `notes-chapters` (write → two independent
 reviews → fix → translate → check → commit, per chapter),
-`notes-margins`, `notes-integration` and `notes-visual-qa`.  See
-[`docs/workflow.md`](docs/workflow.md) §7.
+`notes-margins`, `notes-integration`, `notes-visual-qa` and
+`notes-proofread` (reviewers report findings for a proofreading pass).  See
+[`docs/workflow.md`](docs/workflow.md) §8.
 
 ## Macro reference
 
@@ -190,7 +203,8 @@ read in the browser at `https://github.com/<owner>/<repo>/blob/pdf/notes-en.pdf`
 (and `notes-ja.pdf`) without downloading anything.  For a public repository,
 enable GitHub Pages on the `pdf` branch (Settings → Pages → Deploy from a
 branch: `pdf`, `/`) and the notes are served with an index page at
-`https://<owner>.github.io/<repo>/`.  Pushing a tag `v*` attaches the PDFs
+`https://<owner>.github.io/<repo>/` (its subtitle is the repository
+variable `PAGES_SUBTITLE`, if set).  Pushing a tag `v*` attaches the PDFs
 to a GitHub release.  A newer push cancels a build still running for the
 same branch.
 
@@ -226,6 +240,9 @@ yours; choose a license for the content in your course repository.
   制作手順（執筆 → 2 系統のレビュー → 修正 → 翻訳 → 確認 → push、
   完成後の用語統一・相互参照・全ページ目視 QA）は
   [`docs/workflow.md`](docs/workflow.md) にまとめてあります。
+- `tools/glossary-check.py` で `\term` と `glossary.tsv` の照合、
+  `tools/parity-check.py` で英日両版の構造と余白項目の位置の比較が
+  できます（校正パスの最初の機械的な確認、`docs/workflow.md` §4）。
 - `tools/chapter-check.sh <en|ja> <slug>` で章単位のビルド・検査・
   ページ画像化、`tools/book-check.sh <en|ja>` で本全体（同時に 1 冊だけ）、
   `tools/layout-diff.sh <en|ja>` で公開中の PDF とのページ単位の差分を
@@ -244,4 +261,4 @@ GitHub の **Use this template** から新しいリポジトリを作成して�
 記入、`tools/sync-main.py`、サンプル章の削除、README の差し替え、
 GitHub Pages の有効化）は [`docs/workflow.md`](docs/workflow.md) §1 の
 とおりです。`format/` は全ての本で共通なので、本のリポジトリでは編集せず、
-変更はテンプレートで行ってから各リポジトリへコピーします（同 §4）。
+変更はテンプレートで行ってから各リポジトリへコピーします（同 §5）。
