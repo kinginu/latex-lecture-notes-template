@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Summarize a LuaLaTeX log: errors, undefined references and citations,
-multiply-defined labels, missing glyphs, overfull boxes, crowded margins.
+multiply-defined labels, missing glyphs, overfull boxes, crowded margins,
+and (print editions) the figures/tables shrunk to the measure.
 
     tools/log-summary.py <log> <lang> [<chapter-slug>] [--max-moved N]
 
@@ -82,6 +83,12 @@ too_many = max_moved is not None and moved > max_moved
 problems += too_many
 print(f"== margin notes moved down (crowded margin): {moved}"
       + (f" -> more than --max-moved {max_moved}" if too_many else ""))
+
+# Print editions: figures and tables the class shrank to the measure
+# (informational, not a problem).
+fits = re.findall(r"(?m)^lnotes-fit: .*$", joined)
+if fits:
+    print(f"== figures/tables shrunk to the measure (lnotes-fit): {len(fits)}")
 
 pages = re.findall(r"Output written on \S+ \((\d+) pages?", joined)
 print(f"== pages: {pages[-1] if pages else '?'}")
