@@ -43,6 +43,21 @@ jobs:
           path: dist/
           if-no-files-found: error
 
+      # The logs feed tools/log-summary.py (overfull boxes, undefined refs)
+      # and tools/layout-report.py (which maps pages to chapters by the .toc).
+      # Uploaded here, by the A4 job: the publish job has no build tree.
+      - name: Upload build logs
+        if: always() && matrix.variant == 'a4'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: |
+            en/build/main.log
+            ja/build/main.log
+            en/build/main.toc
+            ja/build/main.toc
+          if-no-files-found: warn
+
   # Collects whatever the build jobs produced.  A failed print size does not
   # hold back the A4 editions; a missing A4 edition fails the job.
   publish:
@@ -64,20 +79,6 @@ jobs:
             [ -f "$f" ] || { echo "missing $f"; exit 1; }
           done
           ls -l dist/
-
-      # The logs feed tools/log-summary.py (overfull boxes, undefined refs)
-      # and tools/layout-report.py (which maps pages to chapters by the .toc).
-      - name: Upload build logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-logs
-          path: |
-            en/build/main.log
-            ja/build/main.log
-            en/build/main.toc
-            ja/build/main.toc
-          if-no-files-found: warn
 
       - name: Generate index.html for GitHub Pages
         env:
