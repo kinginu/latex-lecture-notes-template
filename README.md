@@ -134,10 +134,14 @@ write `glossary.tsv`, replace this README.  Items that are easy to miss:
 | `tools/commit-pass.sh "<subject>" …` | commit and push a cross-chapter pass (`COMMIT_SCOPE=en\|ja`) |
 | `tools/glossary-check.py [--lang en\|ja\|both] [--lesson NN]` | `\term` use against `glossary.tsv`: ownership, missing terms, glosses, readings |
 | `tools/parity-check.py [--lesson NN] [--lint]` | EN/JA structure and margin anchors per chapter; `--lint` flags "the lecture", "you", 講義では … in the body |
+| `tools/chapter-lint.py <slug\|NN> \| --all` | no-TeX checks of one chapter in both editions (syntax, labels, EN/JA counts, citations, references, `\term`, recurrent style defects); the pre-push gate without a local TeX |
+| `tools/layout-report.py <main.log> [--toc main.toc]` | overfull boxes and moved margin notes of a whole-book log, per chapter and page |
 
 Memory limits (`CHAPTER_MEM`, `BOOK_MEM`), the image name (`LNOTES_IMAGE`)
 and commit trailers (`.git/commit-trailers`) are described in
-`tools/lib.sh` and `docs/workflow.md`.
+`tools/lib.sh` and `docs/workflow.md`.  Without a local TeX, CI is the
+build: it uploads the logs as the artifact `build-logs`
+(`docs/workflow.md` §6).
 
 ### Claude Code
 
@@ -145,8 +149,9 @@ and commit trailers (`.git/commit-trailers`) are described in
 Claude Code: `notes-glossary`, `notes-chapters` (write → two independent
 reviews → fix → translate → check → commit, per chapter),
 `notes-margins`, `notes-integration`, `notes-visual-qa` and
-`notes-proofread` (reviewers report findings for a proofreading pass).  See
-[`docs/workflow.md`](docs/workflow.md) §8.
+`notes-proofread` (reviewers report findings for a proofreading pass) and
+`notes-review` (reviewers and a fixer per chapter of a finished book).  See
+[`docs/workflow.md`](docs/workflow.md) §11.
 
 ## Macro reference
 
@@ -243,6 +248,9 @@ yours; choose a license for the content in your course repository.
 - `tools/glossary-check.py` で `\term` と `glossary.tsv` の照合、
   `tools/parity-check.py` で英日両版の構造と余白項目の位置の比較が
   できます（校正パスの最初の機械的な確認、`docs/workflow.md` §4）。
+- TeX がない環境では `tools/chapter-lint.py <slug>` が push 前の検査、
+  CI のアーティファクト `build-logs` と `tools/layout-report.py` が
+  ビルド結果の確認になります（`docs/workflow.md` §6）。
 - `tools/chapter-check.sh <en|ja> <slug>` で章単位のビルド・検査・
   ページ画像化、`tools/book-check.sh <en|ja>` で本全体（同時に 1 冊だけ）、
   `tools/layout-diff.sh <en|ja>` で公開中の PDF とのページ単位の差分を
@@ -261,4 +269,4 @@ GitHub の **Use this template** から新しいリポジトリを作成して�
 記入、`tools/sync-main.py`、サンプル章の削除、README の差し替え、
 GitHub Pages の有効化）は [`docs/workflow.md`](docs/workflow.md) §1 の
 とおりです。`format/` は全ての本で共通なので、本のリポジトリでは編集せず、
-変更はテンプレートで行ってから各リポジトリへコピーします（同 §5）。
+変更はテンプレートで行ってから各リポジトリへコピーします（同 §8）。

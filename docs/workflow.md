@@ -16,7 +16,14 @@ because skipping it let real defects through.
 2. Fill in `docs/book.md` (source material, citation formats, textbook,
    code language, exclusions) and `docs/syllabus.json` (one entry per
    chapter: `number`, `slug`, `title`, `title_ja`, `units`; optional
-   `parts`; `unit` is the word used in commit messages).
+   `parts`; `unit` is the word used in commit messages).  `title_ja` is
+   required: `tools/sync-main.py` writes it into `ja/main.tex`.  `units` is
+   **mandatory** before any chapter is written: it is the ordered list of
+   the source's units for the chapter (for a course, the video titles of the
+   lesson, from the public course outline or video list; for a tutorial,
+   its section headings), and writers and reviewers verify coverage against
+   it.  A book without it (cs6200-notes) left the reviewers reconstructing
+   the lecture structure from memory.
 3. Set the title block and class options in `en/main.tex` and `ja/main.tex`
    (`chapter` option for "Chapter 3" instead of "Lesson 3"), delete the two
    sample chapters and their `glossary.tsv` rows, and run
@@ -43,7 +50,7 @@ because skipping it let real defects through.
 ## 2. Write chapters
 
 Each chapter goes through five stages; chapters are independent and can
-run in parallel (see §6 for how many).
+run in parallel (see §9 for how many).
 
 | Stage | What happens | Output |
 |---|---|---|
@@ -74,7 +81,7 @@ After the last chapter, one edition or one concern at a time:
    layout in the chapter sources (style guide §8).  Commit each edition with
    `COMMIT_SCOPE=<lang> tools/commit-pass.sh "<subject>" "<body>"`.
    Defects that only the class can fix are collected, not patched locally
-   (§5).
+   (§8).
 
 Each pass commits with `tools/commit-pass.sh`.
 
@@ -133,10 +140,106 @@ findings applied); its commit message is the template for the one below.
    undefined references and citations, multiply-defined labels, missing
    glyphs, overfull boxes, index warnings).
 
-The `notes-proofread` workflow (§8) runs step 2 and returns the findings
+The `notes-proofread` workflow (§11) runs step 2 and returns the findings
 grouped by chapter; steps 3–6 stay with the lead.
 
-## 5. Class changes
+## 5. Review pass on a finished book
+
+The Review EN stage of §2 (two reviewers, then a fixer) can also be run
+afterwards over a finished book, e.g. one whose chapters were written
+before the stage existed.  Unlike the proofreading pass (§4) there is no
+lead between reviewers and fixer: the fixer vets the findings itself.  It
+was run this way on cs6200-notes (16 chapters).  Per chapter:
+
+1. **Two read-only reviewers in parallel.**
+   - *Technical*: recompute every number and re-trace every example and
+     table; fetch and read the cited papers, manuals and documentation and
+     check every claim attributed to them (a claim that the paper does not
+     make, or makes differently, is a finding); verify every bibliography
+     entry (authors, title, venue, year, URL); check real-world numbers in
+     the margin and their sources.
+   - *Scope and conventions*: walk the `units` of the chapter
+     (`docs/syllabus.json`) in order and decide for each whether the
+     chapter covers it; flag material beyond the units, register
+     (style guide §1), excluded material (`book.md`), macro and label
+     conventions (`tools/chapter-lint.py` output), "Lesson N" references
+     that point to a chapter which does not treat the topic, margin notes
+     with real-world numbers and no named source, and margin density
+     (style guide §3.1).  For a thin chapter it proposes concrete margin
+     items, each with its source.
+2. **One fixer** verifies every finding (recompute, look it up) and may
+   reject one with a one-line reason.  Where the lecture simplifies against
+   the paper, it keeps the lecture's statement and adds a `\caution`
+   "lecture vs paper" (style guide §1).  It edits EN, mirrors every change
+   into JA (same items, same anchors), adds the margin items it accepted,
+   runs `tools/chapter-lint.py <slug>` until clean (and
+   `tools/chapter-check.sh` for both editions where TeX is available), and
+   commits with `tools/commit-lesson.sh <slug>`.
+
+Parallel agents: one chapter per agent set, never two agents on one
+chapter's files.  New glossary rows are appended with `printf '…\t…\n' >>
+glossary.tsv`, never by rewriting the file; `commit-lesson.sh` stages only
+the rows of its own lesson.  With a cap of about 20 concurrent agents and 3
+agents per chapter, run about 6 chapters at a time.  The pass changes
+layout (on cs6200-notes overfull boxes > 3 pt went from 0 to 8 and moved
+margin notes from 24 to 108 in EN, 39 to 126 in JA): plan a layout pass
+(§7) after it.  The `notes-review` workflow (§11) runs this section.
+
+## 6. Working without a local TeX
+
+When the machine has no TeX installation (or no room for the Docker
+image), CI is the only build.
+
+- **Pre-push gate**: `tools/chapter-lint.py <slug>` (or `--all`) checks
+  both editions of a chapter without TeX: syntax, labels, EN/JA counts,
+  citations and references, `\term` against `glossary.tsv`, and the
+  recurrent style defects of style guide §3.  Run it, with
+  `tools/parity-check.py` and `tools/glossary-check.py`, before every push.
+- **Logs**: CI uploads the artifact `build-logs` (`en/build/main.log`,
+  `ja/build/main.log`, `main.toc` of both) even when the build fails:
+  ```sh
+  gh run download <run-id> -n build-logs -D /tmp/logs
+  tools/log-summary.py /tmp/logs/en/build/main.log en     # no slug: whole book
+  tools/layout-report.py /tmp/logs/en/build/main.log --toc /tmp/logs/en/build/main.toc
+  ```
+  `log-summary.py` gives the totals (errors, undefined references, overfull
+  boxes, moved margin notes, pages); `layout-report.py` places overfull
+  boxes and moved notes on chapters and pages.
+- **One build per batch**: a push cancels the CI run of the previous push,
+  so only the last push of a batch is built.  Push a batch, wait for its
+  run (`gh run watch --exit-status`), read the logs, then push the fixes.
+- Rendered pages cannot be read locally; the PDFs are in the artifact
+  `notes-pdf` and on the `pdf` branch.
+
+## 7. Layout pass
+
+A content pass over finished chapters (§4, §5) moves page breaks and
+crowds margins.  A layout pass restores the book; it changes no content.
+
+- **Metrics** (whole-book logs, both editions): 0 errors, 0 overfull boxes
+  > 3 pt, fewer than 3 moved margin notes on every page, and a total of
+  moved notes near the baseline before the content pass.  On cs6200-notes
+  the pass went from 108 / 126 (EN / JA) to 33 / 47 against a baseline of
+  24 / 39.
+- **Remedies, in this order**:
+  1. move the item to an emptier paragraph nearby (the sentence it
+     supports usually allows one or two paragraphs of freedom);
+  2. merge adjacent notes on the same point;
+  3. shorten the note;
+  4. demote it to a parenthesis in the body (only if it is short and the
+     body reads well with it);
+  5. turn a note of more than 3 lines into a `\sidenote`;
+  6. overfull lines: `\allowbreak` inside long `\texttt` paths and
+     identifiers; `\setlength{\tabcolsep}{4pt}` for a wide table;
+     `sloppypar` around one paragraph as the last resort.
+- EN and JA keep identical margin counts and anchors
+  (`tools/chapter-lint.py`, `tools/parity-check.py`): a remedy applied to
+  one edition is applied to the other, unless a `%` comment documents a
+  deliberate anchor difference.
+- Iterate with CI (§6): batch the edits for all affected chapters, push
+  once, compare `layout-report.py` with the previous run.
+
+## 8. Class changes
 
 `format/` is shared by every book made from the template and must stay
 identical everywhere.
@@ -154,7 +257,7 @@ Loading order matters in the class: `amsmath` and `mathtools` must be
 loaded before `unicode-math`, or `\underbrace` prints black boxes while the
 log stays clean.  This is why every stage reads the rendered pages.
 
-## 6. Machine resources
+## 9. Machine resources
 
 - A chapter build needs ~1.5 GB (`CHAPTER_MEM`), a whole-book build ~2.5 GB
   (`BOOK_MEM`) plus rendering.  `tools/book-check.sh` lets only one book
@@ -168,7 +271,7 @@ log stays clean.  This is why every stage reads the rendered pages.
 - Long runs belong in a terminal multiplexer that survives the editor
   (e.g. a systemd user service running tmux).
 
-## 7. Git and publishing
+## 10. Git and publishing
 
 - Commit only through `tools/commit-lesson.sh` and `tools/commit-pass.sh`;
   they stage the content directories only and serialize concurrent commits.
@@ -179,7 +282,7 @@ log stays clean.  This is why every stage reads the rendered pages.
   (and Pages) and attaches them to `v*` releases; a newer push cancels a
   running build.
 
-## 8. With Claude Code
+## 11. With Claude Code
 
 The stages above exist as saved workflows in `.claude/workflows/`
 (run them by name, e.g. "run the notes-chapters workflow for chapters
@@ -194,6 +297,7 @@ the repository it runs in.
 | `notes-integration` | — | §3.2 terminology and §3.3 cross-references |
 | `notes-visual-qa` | `{langs: ["en", "ja"]}` | §3.4, one edition after the other |
 | `notes-proofread` | `{chapters: [...], perReviewer?: 2}` | §4 step 2: reviewers, two chapters each; returns the findings for vetting |
+| `notes-review` | `{chapters: [...], maxParallel?: 6}` | §5: technical + scope reviewers, then a fixer that applies, mirrors and commits each chapter |
 
 Before running them, write the commit trailers to `.git/commit-trailers`.
 A workflow that is interrupted part-way is best continued by looking at

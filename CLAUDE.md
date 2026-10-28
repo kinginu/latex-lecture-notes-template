@@ -21,6 +21,13 @@ LuaLaTeX in Docker.  Read before writing or reviewing anything:
 - `tools/glossary-check.py` / `tools/parity-check.py [--lint]` — `\term`
   use against `glossary.tsv`; EN/JA structure, margin anchors and
   delivery-format wording.  Run before reviewing or proofreading.
+- `tools/chapter-lint.py <slug>` (or `--all`) — no-TeX checks of both
+  editions of a chapter; run before every push.
+- `tools/layout-report.py <main.log> [--toc main.toc]` — overfull boxes and
+  moved margin notes per chapter and page of a whole-book log.
+- Without a local TeX, CI is the build: download the `build-logs` artifact
+  and read it with `tools/log-summary.py` and `tools/layout-report.py`
+  (`docs/workflow.md` §6).
 - `tools/sync-main.py` — regenerate the chapter and bibliography lists in
   both `main.tex` after changing `docs/syllabus.json` or adding `bib/*.bib`.
 - `tools/commit-lesson.sh <slug>` / `tools/commit-pass.sh "<subject>" …` —
@@ -33,7 +40,7 @@ LuaLaTeX in Docker.  Read before writing or reviewing anything:
   homework and project content).
 - `format/` is shared by every book.  In a book repository never edit it;
   report the needed change.  Class changes are made in the template
-  repository and copied to each book (`docs/workflow.md` §5).
+  repository and copied to each book (`docs/workflow.md` §8).
 - Never force-push, reset or rewrite history.  Commit trailers come from
   `.git/commit-trailers`.
 - Whole-book builds need ~2.5 GB: never run two at once, and keep chapter
