@@ -226,6 +226,8 @@ it goes to the margin.
   established English acronyms and identifiers (CPI, TLB, RPC, SSA, IR).
   Use `glossary.tsv` for every technical term.
 - `\term[よみ]{語}[English term]` — reading in hiragana, English gloss.
+  With `index=dual` the Japanese edition also carries an English index
+  built from the glosses, so give every defining `\term` its gloss.
 - `\lessoninfo` keywords separated by `，`; `video={Lesson 4，動画 1--48}`;
   key point summary title `[章のまとめ]`; other chapters as `第N章`.
 - Numbers, units, math and code identical to the English edition.
