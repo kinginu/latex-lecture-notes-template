@@ -63,7 +63,7 @@
 %%   {top}{bottom}{scale}
 %% The scale shrinks the A4 design (fonts, skips, figures) to the page; the
 %% body font is 10pt x scale.  \@namedef, not \def: a digit ends a csname.
-\@namedef{ln@sz@a5}{{148}{210}{15}{86}{3.5}{35}{13}{14}{0.7}}
+\@namedef{ln@sz@a5}{{148}{210}{15}{93}{3.5}{30}{13}{14}{0.7}}
 \@namedef{ln@sz@b5}{{182}{257}{18}{106}{4.5}{43.5}{16}{18}{0.85}}
 \@namedef{ln@sz@b6}{{128}{182}{13}{73}{3}{32}{12}{13}{0.65}}
 \@namedef{ln@sz@shinsho}{{113}{176}{13}{63}{3}{27}{12}{13}{0.65}}
