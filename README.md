@@ -89,9 +89,13 @@ column moves to the outer side and everything is the A4 design scaled by
 tables are drawn at the A4 sizes, scaled, and shrunk to the measure only if
 still too wide (logged as `lnotes-fit:`).  Chapters need no changes.
 
+In every edition (A4 included) the title page, contents, bibliography and
+index have no margin column: they span body + gap + margin column, without
+the vertical rule.
+
 | `print=` | trim (mm) | body + margin column (mm) | scale | body font |
 |---|---|---|---|---|
-| `a5` | 148 × 210 | 86 + 35 | 0.7 | 7 pt |
+| `a5` | 148 × 210 | 93 + 30 | 0.7 | 7 pt |
 | `b5` | 182 × 257 | 106 + 43.5 | 0.85 | 8.5 pt |
 | `b6` | 128 × 182 | 73 + 32 | 0.65 | 6.5 pt |
 | `shinsho` (新書判) | 113 × 176 | 63 + 27 | 0.65 | 6.5 pt |
@@ -201,7 +205,8 @@ reviews → fix → translate → check → commit, per chapter),
 
 Class options: `en` (default) / `ja`; `lesson` (default, "Lesson 3") /
 `chapter` ("Chapter 3"; the Japanese edition always prints 第3章);
-`norule` (no vertical rule); `print=a4|a5|b5|b6|shinsho` and `scale=<factor>`
+`norule` (no vertical rule); `gloss=false` (`\term` prints no margin gloss);
+`print=a4|a5|b5|b6|shinsho` and `scale=<factor>`
 (see *Print editions*); `fontsize=` (default 10pt, or 10pt × scale);
 anything else is passed to KOMA-Script `scrbook`.
 
