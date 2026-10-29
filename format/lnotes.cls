@@ -783,8 +783,11 @@
     \IfValueTF{#1}{\ln@orig@maketitle[#1]}{\ln@orig@maketitle}%
     \ln@bodymatter}%
   \NewCommandCopy\ln@orig@tableofcontents\tableofcontents
+  %% Two-sided: the body starts on a recto (\mainmatter would add the blank
+  %% verso after the switch, with the rule).
   \renewcommand*\tableofcontents{%
-    \ln@fullwidthmatter\ln@orig@tableofcontents\ln@bodymatter}%
+    \ln@fullwidthmatter\ln@orig@tableofcontents
+    \if@twoside\cleardoubleoddpage\fi\ln@bodymatter}%
   \NewCommandCopy\ln@orig@printbibliography\printbibliography
   \RenewDocumentCommand\printbibliography{o}{%
     \ln@fullwidthmatter
