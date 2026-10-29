@@ -30,7 +30,8 @@ because skipping it let real defects through.
    `tools/sync-main.py`.
 4. Replace `README.md` with the book's own: title, links to the PDFs,
    status table, and a licence section that keeps the two licences apart
-   (`format/` and the build files are MIT from the template; the notes in
+   (`format/` and the build files are MIT from the template, except
+   `format/lnmarginfix.sty`, which stays LPPL 1.3c; the notes in
    `en/`, `ja/` and `figures/` need their own line, e.g. "© <holder>,
    CC BY-NC-SA 4.0").  Put the copyright holder of the book into
    `LICENSE`.
@@ -42,6 +43,15 @@ because skipping it let real defects through.
    repository variable `PAGES_SUBTITLE` (Settings → Secrets and variables
    → Actions → Variables) to change it
    (`.github/scripts/pdf-index.sh`).
+   CI builds the A4 editions and the A5, B6 and 新書判 print editions,
+   each in colour and grayscale; a book restricts the sizes with the
+   repository variable `PRINT_VARIANTS`, a JSON list that must contain
+   `"a4"`, e.g. `["a4","a5"]` (the template leaves it unset and keeps all
+   sizes; `"b5"` can be added).  The `lint` job's summary shows what
+   `tools/parity-check.py --lint`, `tools/glossary-check.py` and
+   `tools/chapter-lint.py --all` find, with each tool's exit code in its
+   heading; the job is report-only (it always succeeds) and never blocks
+   publishing.
 6. Write `glossary.tsv` **before** the chapters: one row per concept with
    the chapter that first defines it (`lesson`), the Japanese term and its
    reading.  Term ownership is what keeps 20 independently written chapters
@@ -244,9 +254,11 @@ crowds margins.  A layout pass restores the book; it changes no content.
 `format/` is shared by every book made from the template and must stay
 identical everywhere.
 
-1. Change `format/lnotes.cls` in the **template** repository only; build the
+1. Change the class files (`format/lnotes.cls`, `format/lnmarginfix.sty`,
+   `format/lnotes-*.ist`) in the **template** repository only; build the
    template book and a small test document that exercises the change.
-2. Copy the class into each book repository, then for each edition:
+2. Copy every changed file of `format/` (and `.github/workflows/build.yml`
+   when it changed) into each book repository, then for each edition:
    `tools/book-check.sh <lang>` and `tools/layout-diff.sh <lang>`.  The
    diff shows every page whose text moved; a change meant to be cosmetic
    must not change page counts or page breaks.

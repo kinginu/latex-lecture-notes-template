@@ -36,6 +36,7 @@ moved between machines without installing TeX.
 .
 ├── format/                 shared class, index styles   (do not edit per course)
 │   ├── lnotes.cls
+│   ├── lnmarginfix.sty     \marginpar layout (marginfix fork, LPPL)
 │   ├── lnotes-en.ist
 │   └── lnotes-ja.ist
 ├── en/  main.tex  lessons/NN-slug.tex     English edition
@@ -91,7 +92,10 @@ still too wide (logged as `lnotes-fit:`).  Chapters need no changes.
 
 In every edition (A4 included) the title page, contents, bibliography and
 index have no margin column: they span body + gap + margin column, without
-the vertical rule.
+the vertical rule.  An empty page follows the title page in every edition,
+so the contents start on page 3; in the two-sided editions that page is
+the verso behind the title and the contents and the body each start on a
+recto.
 
 | `print=` | trim (mm) | body + margin column (mm) | scale | body font |
 |---|---|---|---|---|
@@ -104,12 +108,20 @@ the vertical rule.
 make docker-en-a5        # -> en/build/main-a5.pdf   (also ja-a5, en-b6, ...)
 make docker-print-b6     # both languages -> dist/notes-<lang>-b6.pdf
 make docker-print        # every size (a5 b6 shinsho b5)
+make docker-gray-a5      # grayscale twins of the A5 PDFs in dist/ (see below)
 tools/book-check.sh en --print a5
 ```
 
 Legibility: below `scale=0.6` the text is not readable, and figure labels
 already fall to about 4.5 pt at 0.65.  CI builds A4, A5, B6 and 新書判 and
-lists the print samples, per size, on the Pages index; B5 is `make` only.
+lists them, per size, on the Pages index; B5 is `make` only unless the book
+adds it to `PRINT_VARIANTS` (see *CI*).
+
+**Grayscale.**  `make dist` and `make print-<size>` also write a grayscale
+twin of each PDF, `dist/notes-<lang>[-<size>]-gray.pdf`, for monochrome
+printing or submission (Ghostscript, every colour converted to gray, fonts
+embedded, same page size and count).  `make gray` / `make gray-<size>`
+redo only the conversion of the PDFs already in `dist/`.
 
 ### VS Code
 
@@ -129,7 +141,8 @@ and `docs/syllabus.json`, set the title block, run `tools/sync-main.py`,
 write `glossary.tsv`, replace this README.  Items that are easy to miss:
 
 - the book's README states the **content licence** separately: `format/`
-  and the build files are MIT (from the template), the notes themselves
+  and the build files are MIT (from the template; `format/lnmarginfix.sty`
+  stays LPPL 1.3c), the notes themselves
   need their own line, e.g. "© <holder>, CC BY-NC-SA 4.0";
 - the copyright holder in `LICENSE`;
 - the subtitle of the GitHub Pages index (repository variable
@@ -206,9 +219,19 @@ reviews → fix → translate → check → commit, per chapter),
 Class options: `en` (default) / `ja`; `lesson` (default, "Lesson 3") /
 `chapter` ("Chapter 3"; the Japanese edition always prints 第3章);
 `norule` (no vertical rule); `gloss=false` (`\term` prints no margin gloss);
+`index=dual` (a second index of the `\term` glosses after the first; default `single`);
 `print=a4|a5|b5|b6|shinsho` and `scale=<factor>`
 (see *Print editions*); `fontsize=` (default 10pt, or 10pt × scale);
 anything else is passed to KOMA-Script `scrbook`.
+
+Margin notes are copyfitted automatically (`format/lnmarginfix.sty`): each
+note's first line sits on the baseline of the line it is anchored to; a
+note that would run below the text block is lifted into free space above
+it, never left hanging below the block; only when nothing fits is it
+carried to the top of the next page, with a "Marginpar on page N carried
+over to the next page" warning in the log.  The "margin notes moved down"
+count of the checkers therefore means notes pushed below their anchors by
+crowding.
 
 ### Index readings (Japanese)
 
@@ -236,21 +259,34 @@ words containing kanji do:
 `.github/workflows/build.yml` builds `dist/notes-en.pdf` and
 `dist/notes-ja.pdf` in the same TeX Live image on every push / PR, and in
 parallel the A5, B6 and 新書判 print samples (`dist/notes-<lang>-<size>.pdf`;
-a failed print size does not block the A4 editions); they are uploaded as
-workflow artifacts `pdf-<size>`.  On every push to `main` the PDFs are
+a failed print size does not block the A4 editions), each with its
+grayscale twin (`-gray.pdf`); they are uploaded as workflow artifacts
+`pdf-<size>`.  The sizes built are the repository variable
+`PRINT_VARIANTS` (Settings → Secrets and variables → Actions → Variables),
+a JSON list that must contain `"a4"`: a book restricts its variants with,
+e.g., `["a4","a5"]`, or adds `"b5"`; unset (as in the template), CI builds
+`["a4","a5","b6","shinsho"]`.  A `lint` job runs `tools/parity-check.py
+--lint`, `tools/glossary-check.py` and `tools/chapter-lint.py --all`
+(no TeX) and prints their output in the job summary, with each tool's
+exit code in its heading; it is report-only (the job always succeeds) and
+never blocks the build or the publishing.  On every push to `main` the PDFs are
 also force-pushed to the orphan branch `pdf`, so the latest build can be
 read in the browser at `https://github.com/<owner>/<repo>/blob/pdf/notes-en.pdf`
 (and `notes-ja.pdf`) without downloading anything.  For a public repository,
 enable GitHub Pages on the `pdf` branch (Settings → Pages → Deploy from a
 branch: `pdf`, `/`) and the notes are served with an index page at
 `https://<owner>.github.io/<repo>/` (its subtitle is the repository
-variable `PAGES_SUBTITLE`, if set).  Pushing a tag `v*` attaches the PDFs
+variable `PAGES_SUBTITLE`, if set); the index is one table, a row per
+format and a column each for English and 日本語, colour and gray, with the
+page counts.  Pushing a tag `v*` attaches the PDFs
 to a GitHub release.  A newer push cancels a build still running for the
 same branch.
 
 ## License
 
-MIT for the template (`format/`, build files).  Notes written with it are
+MIT for the template (`format/`, build files).  `format/lnmarginfix.sty`
+is a modified copy of the `marginfix` package and stays under the LaTeX
+Project Public License 1.3c.  Notes written with it are
 yours; choose a license for the content in your course repository.
 
 ---
@@ -292,7 +328,16 @@ yours; choose a license for the content in your course repository.
   確認できます。
 - 印刷用の小型版（両面・余白列は小口側）: `make docker-print-a5`
   （`a5`, `b6`, `shinsho` = 新書判, `b5`）。A4 の版面を縮小するだけで、
-  章ファイルの変更は不要です（*Print editions* 参照）。
+  章ファイルの変更は不要です（*Print editions* 参照）。`make dist` と
+  `make print-<size>` はモノクロ提出用のグレースケール版
+  `dist/notes-<lang>[-<size>]-gray.pdf` も作ります。CI で作る判型は
+  リポジトリ変数 `PRINT_VARIANTS`（例 `["a4","a5"]`、`"a4"` は必須）で
+  絞れます（*CI* 参照）。
+- 余白の注は自動で配置されます（`format/lnmarginfix.sty`）。注の 1 行目は
+  参照先の行のベースラインにそろい、版面の下にはみ出す注は上の空きへ
+  持ち上げ、どうしても入らないときだけ次ページの先頭へ送ってログに警告を
+  出します。検査の「margin notes moved down」は、混み合いで参照先より
+  下へ押し下げられた注の数です。
 - Claude Code 用に `CLAUDE.md` とワークフロー（`.claude/workflows/`）を
   同梱しています。
 - 講義以外の資料（ドキュメント、チュートリアル）を扱う本では

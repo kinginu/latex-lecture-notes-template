@@ -162,6 +162,15 @@ it goes to the margin.
   before the pass (`tools/chapter-check.sh … --max-moved <baseline>`).  A
   chapter that stays above 2 for a documented reason is listed, with the
   reason, in `book.md`.
+- **Copyfitting is automatic.**  The class aligns a margin note's first
+  line with the baseline of its anchor line, lifts a note that would run
+  below the text block into free space above it (a note never hangs below
+  the block), and as a last resort carries it to the top of the next page
+  with a "Marginpar on page N carried over to the next page" warning in the
+  log.  So the "moved down" count above means notes pushed below their
+  anchors by crowding, not notes running off the page; a "carried over"
+  warning means the page's margin is full and the chapter should thin it
+  out.
 - **Real-world numbers are welcome even when the source does not give
   them** — they are what makes the notes usable later.  Name where the
   number comes from in the same note or an adjacent `\source` (vendor
@@ -226,6 +235,8 @@ it goes to the margin.
   established English acronyms and identifiers (CPI, TLB, RPC, SSA, IR).
   Use `glossary.tsv` for every technical term.
 - `\term[よみ]{語}[English term]` — reading in hiragana, English gloss.
+  With `index=dual` the Japanese edition also carries an English index
+  built from the glosses, so give every defining `\term` its gloss.
 - `\lessoninfo` keywords separated by `，`; `video={Lesson 4，動画 1--48}`;
   key point summary title `[章のまとめ]`; other chapters as `第N章`.
 - Numbers, units, math and code identical to the English edition.

@@ -3,7 +3,13 @@
 %% Layout: single-column body on the left, a narrow margin column on the
 %% right (Tufte-style sidenotes) separated by a thin vertical rule.
 %% The title page, contents, bibliography and index span the full width.
+%% An empty page follows the title page in every edition, so the contents
+%% start on page 3 (two-sided: on a recto); two-sided, the body also starts
+%% on a recto.
 %% Engine:  LuaLaTeX only (luatexja for Japanese).
+%% Files:   format/lnmarginfix.sty lays out the \marginpar notes (a fork of
+%%          marginfix; LPPL 1.3c, unlike the MIT class); format/lnotes-en.ist,
+%%          format/lnotes-ja.ist are the upmendex styles.
 %%
 %% Class options (key=value)
 %%   en | ja        document language (default: en)
@@ -11,6 +17,7 @@
 %%                  the Japanese edition always prints 第3章
 %%   norule         do not draw the vertical rule between body and margin
 %%   gloss=false    \term prints no margin gloss (default true)
+%%   index=dual     a second index of the glosses, after the first (default single)
 %%   print=<size>   a4 (default: screen edition, one-sided) or a compact
 %%                  two-sided print edition: a5, b5, b6, shinsho (新書判)
 %%   scale=<factor> print editions: override the size's scale factor
@@ -45,11 +52,20 @@
 \def\ln@scale{}
 \def\ln@fontsize{}
 \def\ln@twoside{}
+\newif\ifln@dualindex
+\def\ln@str@single{single}
+\def\ln@str@dual{dual}
+\def\ln@setindex#1{\def\ln@tmp{#1}%
+  \ifx\ln@tmp\ln@str@dual \ln@dualindextrue
+  \else\ifx\ln@tmp\ln@str@single \ln@dualindexfalse
+  \else\ClassError{lnotes}{Unknown value index=#1}{Use index=single or index=dual.}%
+  \fi\fi}
 \DeclareKeys[lnotes]{
   en       .code     = \ln@jafalse,
   ja       .code     = \ln@jatrue,
   norule   .code     = \ln@rulefalse,
   gloss    .if       = ln@gloss,
+  index    .code     = \ln@setindex{#1},
   lesson   .code     = \def\ln@unitname{Lesson},
   chapter  .code     = \def\ln@unitname{Chapter},
   print    .store    = \ln@print,
@@ -317,6 +333,7 @@
   \newcommand*{\sourcesname}{資料}
   \newcommand*{\textbookname}{教科書}
   \newcommand*{\keywordsname}{キーワード}
+  \newcommand*{\secondindexname}{English index}% index=dual: of the glosses
 \else
   \AtBeginDocument{\renewcommand*{\chaptername}{\ln@unitname}}
   \newcommand*{\definitionname}{Definition}
@@ -330,17 +347,22 @@
   \newcommand*{\sourcesname}{Sources}
   \newcommand*{\textbookname}{Textbook}
   \newcommand*{\keywordsname}{Keywords}
+  \newcommand*{\secondindexname}{日本語索引}% index=dual: of the glosses
 \fi
 
 %% ------------------------------------------------------------- margin core
 \RequirePackage{marginnote}
 \RequirePackage{ragged2e}
-%% Two-sided: LaTeX decides the side of a \marginpar from the page counter
-%% when the note is processed, so a note on the first line of a page can land
-%% on the previous page's side; mparhack fixes this through the .aux.
-\if@twoside
-  \RequirePackage{mparhack}
-\fi
+%% \marginpar notes are laid out per page by lnmarginfix (format/, a fork of
+%% marginfix, LuaTeX only): a note that would run below the text block is
+%% moved up into free space above it, and what still does not fit is carried
+%% to the top of the next page, as is a note whose anchor line the page
+%% builder moved to the next page.  A note's first baseline sits on its
+%% anchor's baseline.  The side (outer column when two-sided) is picked when
+%% the page is built, so mparhack is not needed.  Load it after any package
+%% that patches \marginpar or \@addmarginpar.  \marginnote (in boxes,
+%% below) is placed where it is called, as before, and is not moved.
+\RequirePackage{lnmarginfix}
 %% Print: 0.75 of the body font (A4 \footnotesize is 0.8), against crowding.
 \ifln@print
   \edef\ln@mfs{\ln@sdim{7.5}{pt}}
@@ -390,6 +412,14 @@
 %% .latexmkrc, because latexmk -- not imakeidx -- runs the index processor.
 \RequirePackage{imakeidx}
 \makeindex[intoc,columns=2]
+%% index=dual: a second index of the glosses (\term's last argument), named
+%% <jobname>-second so the print jobs sharing build/ keep their own files
+%% (main-second.idx, main-a5-second.idx).  The glosses are in the other
+%% edition's language; .latexmkrc sorts this index with that edition's style.
+\ifln@dualindex
+  \edef\ln@secondidx{\jobname-second}
+  \makeindex[name=\ln@secondidx,title=\secondindexname,intoc,columns=2]
+\fi
 \indexsetup{headers={{\indexname}{\indexname}}}% imakeidx uppercases by default
 %% Cross-references inside the index: \index{BTB|see{branch target buffer}}
 \ifln@ja
@@ -447,11 +477,13 @@
 %%   - adds an index entry (sorted by <sort key> when given)
 %%   - shows <margin gloss> (e.g. the English term) in the margin, unless
 %%     the class option gloss=false is set
-%% \term* does the same without the index entry (for repeated mentions).
+%%   - index=dual: also indexes <margin gloss> in the second index
+%% \term* does the same without the index entries (for repeated mentions).
 \NewDocumentCommand{\term}{s o m o}{%
   \termformat{#3}%
   \IfBooleanF{#1}{%
     \IfValueTF{#2}{\index{#2@#3}}{\index{#3}}%
+    \ifln@dualindex\IfValueT{#4}{\index[\ln@secondidx]{#4}}\fi
   }%
   \ifln@gloss\IfValueT{#4}{\ln@margin{\textcolor{ln-accent}{$\triangleright$}\,\ln@gloss{#4}}}\fi
 }
@@ -790,11 +822,23 @@
 
 %% Full-width matter (see above): the title page, contents, bibliography and
 %% index.  Wrapped at \begin{document}, after every package has defined them.
+\newcommand*{\ln@emptyafter@title}{%
+  \clearpage
+  \if@twoside
+    \cleardoubleoddpageusingstyle{empty}%
+  \else
+    \thispagestyle{empty}\null\clearpage
+  \fi}
 \AtBeginDocument{%
   \NewCommandCopy\ln@orig@maketitle\maketitle
+  %% An empty page follows the title in every edition (no head, foot or
+  %% rule: still full-width matter, page style empty), so the contents start
+  %% on page 3; two-sided, the empty page is the verso and the contents
+  %% start on a recto whatever the length of the title.
   \RenewDocumentCommand\maketitle{o}{%
     \ln@fullwidthmatter
     \IfValueTF{#1}{\ln@orig@maketitle[#1]}{\ln@orig@maketitle}%
+    \ln@emptyafter@title
     \ln@bodymatter}%
   \NewCommandCopy\ln@orig@tableofcontents\tableofcontents
   %% Two-sided: the body starts on a recto (\mainmatter would add the blank
@@ -807,10 +851,13 @@
     \ln@fullwidthmatter
     \IfValueTF{#1}{\ln@orig@printbibliography[#1]}{\ln@orig@printbibliography}%
     \ln@bodymatter}%
+  %% index=dual: \printindex without an argument prints both indexes.
   \NewCommandCopy\ln@orig@printindex\printindex
   \RenewDocumentCommand\printindex{o}{%
     \ln@fullwidthmatter
-    \IfValueTF{#1}{\ln@orig@printindex[#1]}{\ln@orig@printindex}%
+    \IfValueTF{#1}{\ln@orig@printindex[#1]}{%
+      \ln@orig@printindex
+      \ifln@dualindex\ln@orig@printindex[\ln@secondidx]\fi}%
     \ln@bodymatter}}
 
 \endinput
