@@ -36,6 +36,7 @@ moved between machines without installing TeX.
 .
 ├── format/                 shared class, index styles   (do not edit per course)
 │   ├── lnotes.cls
+│   ├── lnmarginfix.sty     \marginpar layout (marginfix fork, LPPL)
 │   ├── lnotes-en.ist
 │   └── lnotes-ja.ist
 ├── en/  main.tex  lessons/NN-slug.tex     English edition
@@ -140,7 +141,8 @@ and `docs/syllabus.json`, set the title block, run `tools/sync-main.py`,
 write `glossary.tsv`, replace this README.  Items that are easy to miss:
 
 - the book's README states the **content licence** separately: `format/`
-  and the build files are MIT (from the template), the notes themselves
+  and the build files are MIT (from the template; `format/lnmarginfix.sty`
+  stays LPPL 1.3c), the notes themselves
   need their own line, e.g. "© <holder>, CC BY-NC-SA 4.0";
 - the copyright holder in `LICENSE`;
 - the subtitle of the GitHub Pages index (repository variable
@@ -222,6 +224,15 @@ Class options: `en` (default) / `ja`; `lesson` (default, "Lesson 3") /
 (see *Print editions*); `fontsize=` (default 10pt, or 10pt × scale);
 anything else is passed to KOMA-Script `scrbook`.
 
+Margin notes are copyfitted automatically (`format/lnmarginfix.sty`): each
+note's first line sits on the baseline of the line it is anchored to; a
+note that would run below the text block is lifted into free space above
+it, never left hanging below the block; only when nothing fits is it
+carried to the top of the next page, with a "Marginpar on page N carried
+over to the next page" warning in the log.  The "margin notes moved down"
+count of the checkers therefore means notes pushed below their anchors by
+crowding.
+
 ### Index readings (Japanese)
 
 `upmendex` sorts by the string before `@`.  Katakana words need no reading;
@@ -256,8 +267,9 @@ a JSON list that must contain `"a4"`: a book restricts its variants with,
 e.g., `["a4","a5"]`, or adds `"b5"`; unset (as in the template), CI builds
 `["a4","a5","b6","shinsho"]`.  A `lint` job runs `tools/parity-check.py
 --lint`, `tools/glossary-check.py` and `tools/chapter-lint.py --all`
-(no TeX) and prints their output in the job summary; it is marked failed
-when they find something but never blocks the build or the publishing.  On every push to `main` the PDFs are
+(no TeX) and prints their output in the job summary, with each tool's
+exit code in its heading; it is report-only (the job always succeeds) and
+never blocks the build or the publishing.  On every push to `main` the PDFs are
 also force-pushed to the orphan branch `pdf`, so the latest build can be
 read in the browser at `https://github.com/<owner>/<repo>/blob/pdf/notes-en.pdf`
 (and `notes-ja.pdf`) without downloading anything.  For a public repository,
@@ -272,7 +284,9 @@ same branch.
 
 ## License
 
-MIT for the template (`format/`, build files).  Notes written with it are
+MIT for the template (`format/`, build files).  `format/lnmarginfix.sty`
+is a modified copy of the `marginfix` package and stays under the LaTeX
+Project Public License 1.3c.  Notes written with it are
 yours; choose a license for the content in your course repository.
 
 ---
@@ -319,6 +333,11 @@ yours; choose a license for the content in your course repository.
   `dist/notes-<lang>[-<size>]-gray.pdf` も作ります。CI で作る判型は
   リポジトリ変数 `PRINT_VARIANTS`（例 `["a4","a5"]`、`"a4"` は必須）で
   絞れます（*CI* 参照）。
+- 余白の注は自動で配置されます（`format/lnmarginfix.sty`）。注の 1 行目は
+  参照先の行のベースラインにそろい、版面の下にはみ出す注は上の空きへ
+  持ち上げ、どうしても入らないときだけ次ページの先頭へ送ってログに警告を
+  出します。検査の「margin notes moved down」は、混み合いで参照先より
+  下へ押し下げられた注の数です。
 - Claude Code 用に `CLAUDE.md` とワークフロー（`.claude/workflows/`）を
   同梱しています。
 - 講義以外の資料（ドキュメント、チュートリアル）を扱う本では
