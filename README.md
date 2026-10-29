@@ -91,7 +91,10 @@ still too wide (logged as `lnotes-fit:`).  Chapters need no changes.
 
 In every edition (A4 included) the title page, contents, bibliography and
 index have no margin column: they span body + gap + margin column, without
-the vertical rule.
+the vertical rule.  An empty page follows the title page in every edition,
+so the contents start on page 3; in the two-sided editions that page is
+the verso behind the title and the contents and the body each start on a
+recto.
 
 | `print=` | trim (mm) | body + margin column (mm) | scale | body font |
 |---|---|---|---|---|
@@ -104,12 +107,20 @@ the vertical rule.
 make docker-en-a5        # -> en/build/main-a5.pdf   (also ja-a5, en-b6, ...)
 make docker-print-b6     # both languages -> dist/notes-<lang>-b6.pdf
 make docker-print        # every size (a5 b6 shinsho b5)
+make docker-gray-a5      # grayscale twins of the A5 PDFs in dist/ (see below)
 tools/book-check.sh en --print a5
 ```
 
 Legibility: below `scale=0.6` the text is not readable, and figure labels
 already fall to about 4.5 pt at 0.65.  CI builds A4, A5, B6 and 新書判 and
-lists the print samples, per size, on the Pages index; B5 is `make` only.
+lists them, per size, on the Pages index; B5 is `make` only unless the book
+adds it to `PRINT_VARIANTS` (see *CI*).
+
+**Grayscale.**  `make dist` and `make print-<size>` also write a grayscale
+twin of each PDF, `dist/notes-<lang>[-<size>]-gray.pdf`, for monochrome
+printing or submission (Ghostscript, every colour converted to gray, fonts
+embedded, same page size and count).  `make gray` / `make gray-<size>`
+redo only the conversion of the PDFs already in `dist/`.
 
 ### VS Code
 
@@ -237,15 +248,25 @@ words containing kanji do:
 `.github/workflows/build.yml` builds `dist/notes-en.pdf` and
 `dist/notes-ja.pdf` in the same TeX Live image on every push / PR, and in
 parallel the A5, B6 and 新書判 print samples (`dist/notes-<lang>-<size>.pdf`;
-a failed print size does not block the A4 editions); they are uploaded as
-workflow artifacts `pdf-<size>`.  On every push to `main` the PDFs are
+a failed print size does not block the A4 editions), each with its
+grayscale twin (`-gray.pdf`); they are uploaded as workflow artifacts
+`pdf-<size>`.  The sizes built are the repository variable
+`PRINT_VARIANTS` (Settings → Secrets and variables → Actions → Variables),
+a JSON list that must contain `"a4"`: a book restricts its variants with,
+e.g., `["a4","a5"]`, or adds `"b5"`; unset (as in the template), CI builds
+`["a4","a5","b6","shinsho"]`.  A `lint` job runs `tools/parity-check.py
+--lint`, `tools/glossary-check.py` and `tools/chapter-lint.py --all`
+(no TeX) and prints their output in the job summary; it is marked failed
+when they find something but never blocks the build or the publishing.  On every push to `main` the PDFs are
 also force-pushed to the orphan branch `pdf`, so the latest build can be
 read in the browser at `https://github.com/<owner>/<repo>/blob/pdf/notes-en.pdf`
 (and `notes-ja.pdf`) without downloading anything.  For a public repository,
 enable GitHub Pages on the `pdf` branch (Settings → Pages → Deploy from a
 branch: `pdf`, `/`) and the notes are served with an index page at
 `https://<owner>.github.io/<repo>/` (its subtitle is the repository
-variable `PAGES_SUBTITLE`, if set).  Pushing a tag `v*` attaches the PDFs
+variable `PAGES_SUBTITLE`, if set); the index is one table, a row per
+format and a column each for English and 日本語, colour and gray, with the
+page counts.  Pushing a tag `v*` attaches the PDFs
 to a GitHub release.  A newer push cancels a build still running for the
 same branch.
 
@@ -293,7 +314,11 @@ yours; choose a license for the content in your course repository.
   確認できます。
 - 印刷用の小型版（両面・余白列は小口側）: `make docker-print-a5`
   （`a5`, `b6`, `shinsho` = 新書判, `b5`）。A4 の版面を縮小するだけで、
-  章ファイルの変更は不要です（*Print editions* 参照）。
+  章ファイルの変更は不要です（*Print editions* 参照）。`make dist` と
+  `make print-<size>` はモノクロ提出用のグレースケール版
+  `dist/notes-<lang>[-<size>]-gray.pdf` も作ります。CI で作る判型は
+  リポジトリ変数 `PRINT_VARIANTS`（例 `["a4","a5"]`、`"a4"` は必須）で
+  絞れます（*CI* 参照）。
 - Claude Code 用に `CLAUDE.md` とワークフロー（`.claude/workflows/`）を
   同梱しています。
 - 講義以外の資料（ドキュメント、チュートリアル）を扱う本では
