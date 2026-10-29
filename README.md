@@ -205,7 +205,8 @@ reviews → fix → translate → check → commit, per chapter),
 
 Class options: `en` (default) / `ja`; `lesson` (default, "Lesson 3") /
 `chapter` ("Chapter 3"; the Japanese edition always prints 第3章);
-`norule` (no vertical rule); `print=a4|a5|b5|b6|shinsho` and `scale=<factor>`
+`norule` (no vertical rule); `gloss=false` (`\term` prints no margin gloss);
+`print=a4|a5|b5|b6|shinsho` and `scale=<factor>`
 (see *Print editions*); `fontsize=` (default 10pt, or 10pt × scale);
 anything else is passed to KOMA-Script `scrbook`.
 

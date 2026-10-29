@@ -99,6 +99,8 @@ how it connects to the previous chapter.>
 | `marginfigure` / `margintable` | small figure or table in the margin (50 mm) |
 | `widefigure` / `widetable` | float spanning body + margin; only when the body width (120 mm) really is too narrow |
 
+- An edition whose `main.tex` passes the class option `gloss=false` prints
+  no margin glosses (the word and the index entry stay); write the gloss anyway.
 - The optional first argument of `\term` is the **index sort key** and the last
   one is the **margin gloss**: `\term{Amdahl's law}[Amdahl の法則]` — never
   put `key@display` into the gloss.
