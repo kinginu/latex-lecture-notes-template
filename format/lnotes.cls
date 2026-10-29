@@ -592,6 +592,7 @@
 \newcount\ln@picdepth
 \newcount\ln@tabdepth
 \newif\ifln@tabboxed
+\newif\ifln@nofit
 \ifln@print
   \newsavebox{\ln@picbox}
   \newsavebox{\ln@tabbox}
@@ -608,12 +609,21 @@
   \newcommand*{\ln@fitlog}[2]{% kind, box
     \typeout{lnotes-fit: \CurrentFile:\the\inputlineno\space #1
       \the\wd#2\space -> \the\linewidth}}
+  %% tcolorbox (keypoint, \lessoninfo) draws its frame as a tikzpicture
+  %% around the box it has already typeset at the body size and \linewidth:
+  %% that picture must not be scaled (it set the boxes at scale x width and
+  %% scale x font size).  \ifln@nofit is local to the drawing.
   \AddToHook{env/tikzpicture/before}{%
+    \ifln@nofit\else
     \ifnum\ln@picdepth=0 \begin{lrbox}{\ln@picbox}\ln@designsizes\fi
-    \global\advance\ln@picdepth 1 }
+    \global\advance\ln@picdepth 1 \fi}
   \AddToHook{env/tikzpicture/after}{%
+    \ifln@nofit\else
     \global\advance\ln@picdepth -1
-    \ifnum\ln@picdepth=0 \end{lrbox}\ln@fitpic\fi}
+    \ifnum\ln@picdepth=0 \end{lrbox}\ln@fitpic\fi\fi}
+  \AddToHook{env/tcb@drawing/begin}{\ln@nofittrue}
+  \pretocmd{\tcb@draw@pseudo@segmentation}{\ln@nofittrue}{}%
+    {\ClassWarningNoLine{lnotes}{tcolorbox segmentation not patched}}
   \newcommand*{\ln@fitpic}{%
     \sbox{\ln@picbox}{\scalebox{\ln@scale}{\usebox{\ln@picbox}}}%
     \ifdim\wd\ln@picbox>\linewidth
