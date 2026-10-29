@@ -2,6 +2,7 @@
 %%
 %% Layout: single-column body on the left, a narrow margin column on the
 %% right (Tufte-style sidenotes) separated by a thin vertical rule.
+%% The title page, contents, bibliography and index span the full width.
 %% Engine:  LuaLaTeX only (luatexja for Japanese).
 %%
 %% Class options (key=value)
