@@ -56,10 +56,10 @@ is in [`workflow.md`](workflow.md).
   video={<lecture reference>},        % recorded lectures (omit otherwise)
   sources={<primary material>},       % docs, tutorial, paper, talk (omit if none)
   textbook={<book §…>},               % e.g. H\&P \cite{hennessy2017} §3.3
-  keywords={<6–14 comma-separated key terms>},
+  keywords={<about 6–15 comma-separated key terms>},
 }
 
-<2–4 sentence introduction: what the unit is about, why it matters, and
+<3–5 sentence introduction: what the unit is about, why it matters, and
 how it connects to the previous chapter.>
 
 \section{…}
@@ -77,19 +77,34 @@ how it connects to the previous chapter.>
   reference documentation covers it (formats in `book.md`).  Cite a section
   number only when you are sure of it; otherwise cite the chapter
   ("H\&P ch.~3").
+- `\lessoninfo`: `keywords` lists about 6–15 key terms (a guideline, not a
+  limit); `textbook=` names the textbook chapters or sections.  Papers and
+  RFCs the unit discusses go into `sources=`, each with a bib entry; a book
+  that does not use `sources=` may list them in `textbook=` after the
+  textbooks.
+- Sources without a bib entry are cited inline in a fixed form: man pages
+  as `(sched(7))`, `(proc(5))`; vendor manuals as `(Intel SDM vol.~3A,
+  §4.10)`, `(Arm ARM, D1.3)`.  Everything else gets a `\cite`.
 - Use `definition` for every concept the source defines, `example` for
   worked numeric/trace examples, `note` for remarks, `keypoint` for
   take-aways (sparingly: ≈1 per 2–3 sections plus the final summary).
-- `description`/`itemize` for enumerations; tables (`booktabs`) for
-  comparisons; TikZ figures for structures, timing diagrams, state machines,
-  data flow.
+- The final `keypoint` titled `[Lesson summary]` is required in every
+  chapter.  Mid-chapter key points are untitled unless the title adds
+  information that the box itself does not state.
+- `description`/`itemize` for enumerations; tables for comparisons; TikZ
+  figures for structures, timing diagrams, state machines, data flow.
+- Tables use `booktabs` rules only (`\toprule`, `\midrule`,
+  `\bottomrule`; no vertical rules, no `\hline`), text columns as
+  `>{\raggedright\arraybackslash}p{<width>}`, and `\addlinespace` between
+  groups of rows.  A wide table may reduce `\tabcolsep` to 4pt (§8).
 
 ## 3. Macros
 
 | Macro | Use |
 |---|---|
-| `\term[sort]{word}[gloss]` | **first definition** of a term in the book. EN: gloss = Japanese term. JA: `sort` = hiragana reading (required when the word has kanji; katakana/Latin may omit), gloss = English term. |
-| `\term*{word}` | a later emphasized mention (no index entry, no gloss) |
+| `\term[sort]{word}[gloss]` | **first definition** of a term in the book. EN: gloss = Japanese term. JA: `sort` = hiragana reading (required when the word has kana or kanji, katakana included; none for a Latin acronym), gloss = English term. |
+| `\term*{word}` | a later emphasized mention of a term the glossary owns (no index entry, no gloss) |
+| `\emph{word}` | first use of a word that is **not** a glossary term, or plain emphasis |
 | `\index{key}` | extra index entry without emphasis, e.g. a concept re-used in a later chapter that should also point here; acronyms: `\index{BTB\|see{branch target buffer}}` (JA: `\index{BTB\|see{分岐先バッファ}}`) |
 | `\source{}` | where the section's material comes from |
 | `\tip{}` | practical rule of thumb, calculation shortcut |
@@ -99,8 +114,13 @@ how it connects to the previous chapter.>
 | `marginfigure` / `margintable` | small figure or table in the margin (50 mm) |
 | `widefigure` / `widetable` | float spanning body + margin; only when the body width (120 mm) really is too narrow |
 
-- An edition whose `main.tex` passes the class option `gloss=false` prints
-  no margin glosses (the word and the index entry stay); write the gloss anyway.
+- `\term` is only for words that have a row in `glossary.tsv`; a new word
+  that is not a glossary term is set with `\emph` at its first use.  A later
+  emphasised mention of a glossary term is `\term*`, never `\emph`.
+- The template's English `main.tex` passes the class option `gloss=false`
+  (no margin glosses; the word and the index entry stay); write the gloss
+  anyway: the Japanese edition's English index (`index=dual`) and a later
+  edition with glosses need it.
 - The optional first argument of `\term` is the **index sort key** and the last
   one is the **margin gloss**: `\term{Amdahl's law}[Amdahl の法則]` — never
   put `key@display` into the gloss.
@@ -116,6 +136,15 @@ how it connects to the previous chapter.>
   proper nouns and acronyms; canonical Japanese form and reading).  If a
   needed term is missing, choose the standard term and add the row (or report
   it so the glossary can be updated).
+- Index aliases point both ways: the short form refers to the long one
+  (`\index{BTB|see{branch target buffer}}`), and, when the long form is
+  rarely used in the text, the long form also refers to the short one
+  (`\index{branch target buffer|see{BTB}}`).
+- The `note` column of `glossary.tsv` is `see: X` for an alias row (parsed:
+  the row is a cross-reference, not a term to define), `also: X` for a
+  synonym that the index should mention, and free text otherwise (`cf. X`,
+  "named after …").  `tools/glossary-check.py` notes an `also called X` or a
+  bare synonym in that column.
 - Code identifiers (`mlir::Operation`, `pthread_create`) are set with
   `\texttt{}` (or `\lstinline`) and indexed with a plain `\index{}` if at all;
   they are not glossary terms.
@@ -145,7 +174,7 @@ it goes to the margin.
 |---|---|---|
 | Where the material comes from | `\source` | one per section (required) |
 | Term in the other language | `\term` | automatic |
-| **Real-world numbers** | `\margin` | "L1: 32 KB, 4 cycles; L2: 256 KB, 12 cycles on Intel Skylake" |
+| **Real-world numbers** | `\margin` | "L1: 32 KiB, 4 cycles; L2: 256 KiB, 12 cycles on Intel Skylake" |
 | **Notation and assumptions** | `\margin` | what a symbol means, units, "a write takes one cycle here" |
 | **Link to another chapter** | `\margin` | "same idea as the reservation stations of Lesson 7" |
 | **Source vs textbook terminology** | `\caution` | a term the source uses with a different meaning than the textbook |
@@ -186,6 +215,17 @@ it goes to the margin.
 - Do not park body-level reasoning in the margin: if a reader needs it to
   follow the argument, it belongs in the body.
 
+### 3.2 Units, quotations, references in prose
+
+- Every quantity with a unit is set with `siunitx`: `\SI{4}{\milli\second}`,
+  `\num{1e6}`, `\SIrange{10}{20}{\nano\second}`.  Binary sizes use the
+  IEC prefixes (`\SI{4}{\kibi\byte}`, `\mebi`, `\gibi`, `\tebi`), never a
+  literal "KB" or "MB" inside `\SI`.
+- Quotation marks are `\enquote{…}`, never typed quote characters.
+- Other chapters in prose: `Lesson~7` / `Chapter~7`, with a tie (JA: 第7章).
+  Textbook chapters as `ch.~N` (`OSTEP ch.~7`), sections with the `§`
+  character, never `\S` (`Silberschatz et al.\ §3.4`).
+
 ## 4. Labels, figures, bibliography
 
 - Labels are unique across the whole book and carry the chapter number:
@@ -201,14 +241,18 @@ it goes to the margin.
   "Example"/"Note".
 - Cross-references: `\cref{…}` (a list or range such as
   `\cref{sec:a,sec:b,sec:c}` is fine in both editions); to another chapter
-  in prose: "Lesson 7" (EN) / "第7章" (JA), numbers from `syllabus.json`,
-  and only to a chapter that actually treats the topic.
+  in prose: `Lesson~7` (EN, §3.2) / "第7章" (JA), numbers from
+  `syllabus.json`, and only to a chapter that actually treats the topic.
   Japanese chapters do not use `\Cref`.
 - Figures shared by both editions: `figures/lNN-<name>.tex`, pure TikZ,
   language-dependent text via `\iflangja{日本語}{English}`, must fit the
   body width (120 mm) — or the margin (50 mm) in `marginfigure` (wrap in
   `\resizebox{\linewidth}{!}{…}` if needed).  Japanese labels are wider than
   English ones: size boxes for the Japanese text (§8).
+- Every figure file starts with a header comment: a one-line description,
+  what the figure shows, `Usage: \input{figures/lNN-name}`, and the intended
+  width (body 120 mm or margin 50 mm).  Language-dependent text appears only
+  inside `\iflangja{}{}` (`figures/l01-pipeline-stages.tex` is the model).
 - Bibliography: new entries go only into `bib/<NN-slug>.bib` of your chapter
   (listed in both `main.tex` by `tools/sync-main.py`), after checking with
   `grep -rn "{key," references.bib bib/` that the key does not exist.  Only
@@ -237,8 +281,15 @@ it goes to the margin.
 - `\term[よみ]{語}[English term]` — reading in hiragana, English gloss.
   With `index=dual` the Japanese edition also carries an English index
   built from the glosses, so give every defining `\term` its gloss.
-- `\lessoninfo` keywords separated by `，`; `video={Lesson 4，動画 1--48}`;
-  key point summary title `[章のまとめ]`; other chapters as `第N章`.
+- `\lessoninfo` keywords separated by `，`; items in `\source` and
+  `textbook=` separated by `；`; `video={Lesson 4，動画 1--48}`; key point
+  summary title `[章のまとめ]`; other chapters as `第N章`.
+- Author names in the text: 「Silberschatz ら」, 「Birrell と Nelson」.
+- Every `\term` whose word contains kana or kanji (katakana included) gets
+  a hiragana reading; a Latin acronym (TLB, RPC) has none.
+- A space between a Latin word and adjacent Japanese text (`CPU スケジューラ`,
+  `wait 操作`); none between a numeral and a unit or counter (`3個`,
+  `16ビット`).  Numeric ranges as `N--N` (`1--48`), never `〜`.
 - Numbers, units, math and code identical to the English edition.
 - **Parity is checked mechanically**: the ordered sequence of commands of
   the two editions — sections, labels, `\input`, `\source`, `\margin`,
@@ -282,6 +333,9 @@ book repository (see `workflow.md`, *Class changes*).
 - **Headings at the bottom of a page.**  `\Needspace{5\baselineskip}` (capital
   N: it also works right after a paragraph) before the heading.  Use the
   smallest value that works; a large value leaves a visibly empty page end.
+- **`\Needspace` is a last resort** for a heading or listing that must not
+  be split from what follows.  Add it only once the page layout is final,
+  and remove the ones before headings whose break no longer matters.
 - **Floats.**  Prefer `[tb]` or `[htbp]`; a float that lands in the middle of
   a listing or splits an example is moved before the paragraph it
   illustrates.  Float pages are top-aligned by the class.
@@ -290,7 +344,8 @@ book repository (see `workflow.md`, *Class changes*).
   own line automatically.
 - **Tables.**  Balance `p{}` column widths so short entries do not break
   mid-word; Japanese cells need more width than English ones.
-  `widetable` spans body + margin, but try a narrower `\tabcolsep` first.
+  `widetable` spans body + margin, but try a narrower `\tabcolsep` first
+  (`\setlength{\tabcolsep}{4pt}` inside the table; §2).
 - **Japanese figures.**  Boxes sized for English labels overflow with
   Japanese ones: widen the box or break the label inside the `\iflangja`
   branch only — the English output must not change.
