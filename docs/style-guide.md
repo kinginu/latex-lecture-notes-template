@@ -252,7 +252,8 @@ it goes to the margin.
 - Every figure file starts with a header comment: a one-line description,
   what the figure shows, `Usage: \input{figures/lNN-name}`, and the intended
   width (body 120 mm or margin 50 mm).  Language-dependent text appears only
-  inside `\iflangja{}{}` (`figures/l01-pipeline-stages.tex` is the model).
+  inside `\iflangja{}{}` (the template's sample `figures/l01-pipeline-stages.tex`
+  shows the form).
 - Bibliography: new entries go only into `bib/<NN-slug>.bib` of your chapter
   (listed in both `main.tex` by `tools/sync-main.py`), after checking with
   `grep -rn "{key," references.bib bib/` that the key does not exist.  Only
