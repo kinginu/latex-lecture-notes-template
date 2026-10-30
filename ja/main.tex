@@ -1,7 +1,8 @@
 % !TEX program = lualatex
 % 日本語版．構成は en/main.tex と同一に保つ．
-% index=dual: a second index, in English, built from the \term glosses.
-\documentclass[ja]{lnotes}
+% index=dual: a second index, in English, built from the \term glosses, so
+% a reader can look up the English term as well as the Japanese one.
+\documentclass[ja, index=dual]{lnotes}
 \input{book-preamble}  % this book's own definitions
 
 \addbibresource{\subfix{../references.bib}}
@@ -9,11 +10,13 @@
 % BEGIN bib (tools/sync-main.py)
 % END bib
 
-\title{講義名}
+% The title, author and subject stay in English (the course's own name, as
+% in en/main.tex); only the subtitle is Japanese.
+\title{Course Title}
 \subtitle{講義ノート}
-\author{氏名}
+\author{Your Name}
 \date{\today}
-\subject{COURSE-0000 --- 所属}
+\subject{COURSE-0000 --- Institution}
 
 \begin{document}
 \frontmatter
