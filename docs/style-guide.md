@@ -230,7 +230,9 @@ it goes to the margin.
 
 - Labels are unique across the whole book and carry the chapter number:
   `sec:l04-btb`, `fig:l04-btb`, `tab:l04-…`, `eq:l04-…`, `def:l04-…`,
-  `ex:l04-…`, `lst:l04-…`.  EN and JA use the **same** labels.
+  `ex:l04-…`, `lst:l04-…`.  EN and JA use the **same** labels.  A listing
+  is labelled in its option list,
+  `\begin{lstlisting}[…, label={lst:l04-name}]`, not with `\label`.
 - **Terms at first use.**  A term that `glossary.tsv` assigns to a chapter
   (column `lesson`) is `\term`ed at its first use in that chapter, in both
   editions; other chapters do not `\term` it again (§3).

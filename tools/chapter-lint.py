@@ -12,8 +12,9 @@ For en/lessons/<slug>.tex and ja/lessons/<slug>.tex (and the figures they
   syntax     braces balance (\\{ \\} and comments ignored); \\begin/\\end
              matched in order; \\end{lstlisting} at column 0; listing lines
              at most 60 display columns (East Asian wide characters count 2)
-  labels     prefixed lNN (e.g. sec:l07-...); unique across <lang>/lessons;
-             the same label set in en and ja
+  labels     \\label{...} and label= in a listing's option list; prefixed
+             lNN (e.g. sec:l07-...); unique across <lang>/lessons; the same
+             label set in en and ja
   parity     the same count, en vs ja, of each item in COUNTED (sections,
              margin macros, \\term / \\term*, figure \\input, listings,
              environments, tables); tools/parity-check.py compares the order
@@ -98,6 +99,52 @@ LISTING_WIDTH = 60
 REF = re.compile(r"\\(?:[cC]ref|[vV]ref|ref|pageref|autoref|eqref|labelcref|cpageref|[cC]refrange)\*?\s*\{([^}]*)\}(?:\s*\{([^}]*)\})?")
 CITE = re.compile(r"\\[A-Za-z]*cite[A-Za-z]*\*?\s*(?:\[[^\]]*\]\s*){0,2}\{([^}]*)\}")
 LABEL = re.compile(r"\\label\s*\{([^}]*)\}")
+LISTING = re.compile(r"\\begin\{lstlisting\}|\\lstinputlisting(?![A-Za-z])")
+
+
+def listing_labels(raw, text):
+    """[(pos, label)] of label= / label={...} in the option list of each
+    \\begin{lstlisting}[...] and \\lstinputlisting[...].  strip_noise() blanks
+    the option list together with the listing body, so the options are read
+    from the raw source (comments blanked) at the position of the token
+    found in the stripped text."""
+    raw = re.sub(r"(?<!\\)%[^\n]*", PC.blank, raw)
+    out = []
+    for m in LISTING.finditer(text):
+        i = m.end()
+        while i < len(raw) and raw[i] in " \t\n":
+            i += 1
+        if i >= len(raw) or raw[i] != "[":
+            continue
+        depth, start, parts = 0, i + 1, []
+        for j in range(i + 1, len(raw)):
+            c = raw[j]
+            if c == "\\":
+                continue
+            if c == "{" and raw[j - 1] != "\\":
+                depth += 1
+            elif c == "}" and raw[j - 1] != "\\":
+                depth -= 1
+            elif depth == 0 and c in ",]":
+                parts.append((start, raw[start:j]))
+                start = j + 1
+                if c == "]":
+                    break
+        for pos, opt in parts:
+            key, eq, val = opt.partition("=")
+            if eq and key.strip() == "label":
+                val = val.strip()
+                if val.startswith("{") and val.endswith("}"):
+                    val = val[1:-1].strip()
+                if val:
+                    out.append((pos + len(opt) - len(opt.lstrip()), val))
+    return out
+
+
+def labels_in(raw, text):
+    """[(pos, label)] of every \\label{...} and listing label= in order."""
+    found = [(m.start(), m.group(1).strip()) for m in LABEL.finditer(text)]
+    return sorted(found + listing_labels(raw, text))
 
 
 def width(s):
@@ -124,8 +171,9 @@ class Lint:
         for lang in ("en", "ja"):
             d = self.labels[lang] = {}
             for f in sorted(glob.glob(os.path.join(root, lang, "lessons", "*.tex"))):
-                for m in LABEL.finditer(PC.strip_noise(open(f, encoding="utf-8").read())):
-                    d.setdefault(m.group(1).strip(), []).append(f)
+                raw = open(f, encoding="utf-8").read()
+                for _, lab in labels_in(raw, PC.strip_noise(raw)):
+                    d.setdefault(lab, []).append(f)
         self.found = []
 
     def rel(self, path):
@@ -212,10 +260,10 @@ class Lint:
                     if k and k not in self.labels[lang]:
                         self.add(path, line_of(text, m.start()), f"reference to undefined label {k}")
 
-    def labels_of(self, path, lang, text, nn):
+    def labels_of(self, path, lang, raw, text, nn):
         out = []
-        for m in LABEL.finditer(text):
-            lab, ln = m.group(1).strip(), line_of(text, m.start())
+        for pos, lab in labels_in(raw, text):
+            ln = line_of(text, pos)
             out.append(lab)
             if not re.match(rf"^[A-Za-z]+:l{nn}-", lab):
                 self.add(path, ln, f"label {lab} lacks the prefix <kind>:l{nn}-")
@@ -278,7 +326,7 @@ class Lint:
             self.syntax(path, raw, text)
             self.style(path, lang, text)
             self.refs(path, lang, text)
-            labels[lang] = self.labels_of(path, lang, text, nn)
+            labels[lang] = self.labels_of(path, lang, raw, text, nn)
             self.terms(path, lang, raw, text, n)
             counts[lang] = {k: len(re.findall(rx, text)) for k, rx in COUNTED.items()}
             for m in re.finditer(r"\\input\s*\{([^}]*figures/[^}]*)\}", text):
