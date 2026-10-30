@@ -125,8 +125,11 @@ def terms_in(path):
 
 def load_glossary(path):
     with open(path, encoding="utf-8", newline="") as f:
-        rows = list(csv.DictReader(f, delimiter="\t"))
-    missing = {"en", "ja", "reading", "lesson"} - set(rows[0].keys() if rows else [])
+        reader = csv.DictReader(f, delimiter="\t")
+        # fieldnames, not rows[0]: a header-only glossary is valid (no rows yet)
+        columns = set(reader.fieldnames or [])
+        rows = list(reader)
+    missing = {"en", "ja", "reading", "lesson"} - columns
     if missing:
         sys.exit(f"{path}: missing columns {', '.join(sorted(missing))}")
     out = []
