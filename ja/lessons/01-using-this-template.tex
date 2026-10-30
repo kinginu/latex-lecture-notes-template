@@ -7,7 +7,7 @@
 \lessoninfo{
   video={Lesson 1 (Introduction)},
   textbook={H\&P \cite{hennessy2017} §1.1--1.3},
-  keywords={サイドノート, 索引, 二言語ビルド},
+  keywords={サイドノート，索引，二言語ビルド},
 }
 
 この章はクラスが提供する全マクロの見本である．実際の講義ノートを書き
@@ -36,7 +36,7 @@
 \term[ぱいぷらいん]{パイプライン}[pipeline]のような用語は \verb|\term| で
 導入する．語を強調し，索引に登録し，必要なら余白に対訳（ここでは英語）を
 表示する．日本語の索引は読みで並べ替えるため，漢字を含む語には
-\verb|\term[よみ]{語}| のように読みを与える（カタカナ語は省略できる）．
+\verb|\term[よみ]{語}| のように読みを与える（カタカナ語にも与え，ラテン文字の略語には付けない）．
 2回目以降の\term*{パイプライン}には \verb|\term*| を使い，索引にページ番号が
 並びすぎないようにする．\term[こうそくかりつ]{高速化率}[speedup]と
 \term[あむだーるのほうそく]{Amdahl の法則}[Amdahl's law]も索引に載る．
@@ -84,7 +84,7 @@
 
 \begin{figure}[htbp]
   \centering
-  \input{figures/pipeline-stages}
+  \input{figures/l01-pipeline-stages}
   \caption{古典的な5段パイプライン（共有 TikZ ソース）．}
   \label{fig:l01-pipeline}
 \end{figure}
@@ -128,5 +128,14 @@ loop:   add   r1, r1, r2      ; accumulate
 共有し，\texttt{en/} と \texttt{ja/} 以下の本文だけが異なる．共有ファイルの
 中では \verb|\iflangja{日本語}{英語}| か，省略形の \verb|\ja{...}|，
 \verb|\en{...}| を使う．
+
+\begin{keypoint}[章のまとめ]
+  \begin{itemize}
+    \item 余白マクロは出典，ヒント，注意，補足を担う．
+    \item \verb|\term| は用語集の用語を一度だけ定義し，\verb|\term*| は
+      その後の言及に使う．
+    \item 両言語版は図，文献，クラスを共有する．
+  \end{itemize}
+\end{keypoint}
 
 \end{document}

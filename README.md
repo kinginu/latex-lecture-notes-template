@@ -140,10 +140,15 @@ Follow [`docs/workflow.md`](docs/workflow.md) §1: fill in `docs/book.md`
 and `docs/syllabus.json`, set the title block, run `tools/sync-main.py`,
 write `glossary.tsv`, replace this README.  Items that are easy to miss:
 
-- the book's README states the **content licence** separately: `format/`
-  and the build files are MIT (from the template; `format/lnmarginfix.sty`
-  stays LPPL 1.3c), the notes themselves
-  need their own line, e.g. "© <holder>, CC BY-NC-SA 4.0";
+- the book's README states the **content licence** separately; both books
+  made so far use this wording (replace the holder and, if needed, the
+  licence of the notes):
+
+  > `format/` and the build files come from the template (MIT), except
+  > `format/lnmarginfix.sty`, a modified copy of `marginfix` under the LPPL
+  > 1.3c.  The notes themselves (`en/`, `ja/`, `figures/`) are © <holder>
+  > and released under
+  > [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 - the copyright holder in `LICENSE`;
 - the subtitle of the GitHub Pages index (repository variable
   `PAGES_SUBTITLE`, read by `.github/scripts/pdf-index.sh`; default

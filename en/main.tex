@@ -1,8 +1,13 @@
 % !TEX program = lualatex
 % English edition.  Keep the structure identical to ja/main.tex.
 % Class options: en|ja, lesson ("Lesson 3", default) | chapter ("Chapter 3"),
-% norule.  Keep the options identical in ja/main.tex (except the language).
-\documentclass[en]{lnotes}
+% norule.  Keep the options identical in ja/main.tex (except the language,
+% gloss=false here and index=dual there).
+% gloss=false: no Japanese margin glosses in this edition, so the English
+% screen and print editions read as plain English notes (the \term glosses
+% stay in the sources and feed the English index of the Japanese edition).
+% Remove it to print the Japanese term next to each definition.
+\documentclass[en, gloss=false]{lnotes}
 \input{book-preamble}  % this book's own definitions
 
 \addbibresource{\subfix{../references.bib}}
