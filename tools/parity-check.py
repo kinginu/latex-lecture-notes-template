@@ -9,7 +9,7 @@ sequence of structural tokens is extracted from each edition:
   \\chapter \\section \\subsection (and their starred forms), \\label{...} and
   \\input{...} with their argument, \\begin{env} for the environments in ENVS,
   and the margin macros \\source \\margin \\sidenote \\tip \\caution \\term
-  \\term* (name only).
+  \\term* \\term! (name only).
 
 Comments, \\verb, \\lstinline and lstlisting bodies are ignored.  The two
 sequences are compared with difflib; a lesson whose sequences are identical
@@ -49,7 +49,7 @@ TOKEN = re.compile(
     r"\\(?P<sec>chapter|section|subsection)(?![A-Za-z])(?P<secstar>\*?)"
     r"|\\(?P<arg>label|input)\s*\{(?P<argv>[^}]*)\}"
     r"|\\begin\{(?P<env>" + "|".join(ENVS) + r")\*?\}"
-    r"|\\(?P<mm>" + "|".join(MARGIN) + r")(?![A-Za-z])(?P<mmstar>\*?)")
+    r"|\\(?P<mm>" + "|".join(MARGIN) + r")(?![A-Za-z])(?P<mmstar>[*!]?)")
 LINT = {
     "en": [re.compile(r"\b(the|this) (lecture|video|slides?)\b", re.I),
            re.compile(r"\blet['’]s\b", re.I), re.compile(r"\byou\b", re.I)],
@@ -100,7 +100,7 @@ def tokens(path):
 
 
 def is_margin(t):
-    return t.rstrip("*").lstrip("\\") in MARGIN
+    return t.rstrip("*!").lstrip("\\") in MARGIN
 
 
 def seq_diff(en, ja):

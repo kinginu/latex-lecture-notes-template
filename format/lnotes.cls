@@ -30,6 +30,7 @@
 %%   \iflangja{<ja>}{<en>}   \ja{...}  \en{...}
 %%   \sidenote{...}  \margin{...}  \source{...}  \tip{...}  \caution{...}
 %%   \term[<sort key>]{<word>}[<margin gloss>]   \term*  (no index entry)
+%%   \term!  (index entries, no margin gloss)
 %%   \lessoninfo{video=..., sources=..., textbook=..., keywords=...}
 %%   \definitionname, \keypointname, ... -- localized strings (renewable)
 %% Environments
@@ -476,17 +477,26 @@
 %%   - typesets <word> with \termformat
 %%   - adds an index entry (sorted by <sort key> when given)
 %%   - shows <margin gloss> (e.g. the English term) in the margin, unless
-%%     the class option gloss=false is set
+%%     the class option gloss=false is set or the gloss is the word itself
+%%     (\term{GPU}[GPU]: compared as strings, without expansion)
 %%   - index=dual: also indexes <margin gloss> in the second index
 %% \term* does the same without the index entries (for repeated mentions).
-\NewDocumentCommand{\term}{s o m o}{%
-  \termformat{#3}%
+%% \term! ("quiet") indexes like \term but prints no margin gloss: the 2nd
+%%   and later terms of a definition that introduces several at once.
+\NewDocumentCommand{\term}{s t! o m o}{%
+  \termformat{#4}%
   \IfBooleanF{#1}{%
-    \IfValueTF{#2}{\index{#2@#3}}{\index{#3}}%
-    \ifln@dualindex\IfValueT{#4}{\index[\ln@secondidx]{#4}}\fi
+    \IfValueTF{#3}{\index{#3@#4}}{\index{#4}}%
+    \ifln@dualindex\IfValueT{#5}{\index[\ln@secondidx]{#5}}\fi
   }%
-  \ifln@gloss\IfValueT{#4}{\ln@margin{\textcolor{ln-accent}{$\triangleright$}\,\ln@gloss{#4}}}\fi
+  \ifln@gloss\IfBooleanF{#2}{\IfValueT{#5}{%
+    \ln@ifsame{#4}{#5}{}%
+      {\ln@margin{\textcolor{ln-accent}{$\triangleright$}\,\ln@gloss{#5}}}}}\fi
 }
+%% \ln@ifsame{<a>}{<b>}{<true>}{<false>}: <a> and <b> are the same characters.
+\ExplSyntaxOn
+\cs_new_eq:NN \ln@ifsame \str_if_eq:nnTF
+\ExplSyntaxOff
 
 %% ------------------------------------------------------------- theorem envs
 \RequirePackage{amsthm}
