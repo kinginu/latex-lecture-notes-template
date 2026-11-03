@@ -15,15 +15,17 @@ For en/lessons/<slug>.tex and ja/lessons/<slug>.tex (and the figures they
   labels     prefixed lNN (e.g. sec:l07-...); unique across <lang>/lessons;
              the same label set in en and ja
   parity     the same count, en vs ja, of each item in COUNTED (sections,
-             margin macros, \\term / \\term*, figure \\input, listings,
-             environments, tables); tools/parity-check.py compares the order
+             margin macros, \\term / \\term* / \\term!, figure \\input,
+             listings, environments, tables); tools/parity-check.py
+             compares the order
   refs       every \\cite key is in references.bib or bib/*.bib; every
              \\cref/\\Cref/\\ref target is a \\label of the same edition
-  terms      \\term (not \\term*) only for glossary.tsv rows that this lesson
-             owns (column lesson); gloss = the glossary's other-language
-             term; a JA \\term with kanji carries the glossary reading;
-             no line break inside a \\term argument that contains non-ASCII
-             text (the break becomes a space in the gloss and the index key);
+  terms      \\term and \\term! (not \\term*) only for glossary.tsv rows
+             that this lesson owns (column lesson); gloss = the glossary's
+             other-language term; a JA \\term with kanji carries the
+             glossary reading; no line break inside a \\term argument that
+             contains non-ASCII text (the break becomes a space in the gloss
+             and the index key);
              no \\term inside the arguments of MARGIN_MACROS
   style      no \\tiny in the chapter or its figures; no SOURCE_PHRASES
              (delivery-format words) inside \\source; "Lesson~N" / "第N章"
@@ -70,8 +72,9 @@ COUNTED = {
     "\\sidenote": r"\\sidenote(?![A-Za-z])",
     "\\tip": r"\\tip(?![A-Za-z])",
     "\\caution": r"\\caution(?![A-Za-z])",
-    "\\term": r"\\term(?![A-Za-z*])",
+    "\\term": r"\\term(?![A-Za-z*!])",
     "\\term*": r"\\term\*",
+    "\\term!": r"\\term!",
     "figure \\input": r"\\input\s*\{[^}]*figures/",
     "lstlisting": r"\\begin\{lstlisting\}",
     "example": r"\\begin\{example\}",

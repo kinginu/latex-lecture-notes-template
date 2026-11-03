@@ -210,8 +210,9 @@ reviews → fix → translate → check → commit, per chapter),
 | `\margin{…}` | unnumbered margin note |
 | `\source{…}` | labelled *Source / 出典* note, e.g. `\source{H\&P §3.2}` or `\cite` |
 | `\tip{…}` / `\caution{…}` | labelled *Tip / ヒント*, *Caution / 注意* notes |
-| `\term[sortkey]{word}[gloss]` | emphasize `word`, index it (sorted by `sortkey` if given), print `gloss` in the margin |
+| `\term[sortkey]{word}[gloss]` | emphasize `word`, index it (sorted by `sortkey` if given), print `gloss` in the margin (not when `gloss` is the word itself) |
 | `\term*{word}` | same without an index entry (repeat mentions) |
+| `\term![sortkey]{word}[gloss]` | same index entries as `\term`, no margin gloss (2nd and later terms of one definition) |
 | `\index{よみ@語}` | plain index entry with a reading |
 | `definition`, `example`, `note` | numbered per chapter, shared counter, `\cref`-able |
 | `keypoint` (`[subtitle]`) | shaded take-away box |

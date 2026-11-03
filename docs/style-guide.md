@@ -103,6 +103,7 @@ how it connects to the previous chapter.>
 | Macro | Use |
 |---|---|
 | `\term[sort]{word}[gloss]` | **first definition** of a term in the book. EN: gloss = Japanese term. JA: `sort` = hiragana reading (required when the word has kana or kanji, katakana included; none for a Latin acronym), gloss = English term. |
+| `\term![sort]{word}[gloss]` | a defining `\term` that prints no margin gloss (index entries as `\term`): the 2nd and later terms of a sentence or definition that introduces several |
 | `\term*{word}` | a later emphasized mention of a term the glossary owns (no index entry, no gloss) |
 | `\emph{word}` | first use of a word that is **not** a glossary term, or plain emphasis |
 | `\index{key}` | extra index entry without emphasis, e.g. a concept re-used in a later chapter that should also point here; acronyms: `\index{BTB\|see{branch target buffer}}` (JA: `\index{BTB\|see{分岐先バッファ}}`) |
@@ -121,6 +122,11 @@ how it connects to the previous chapter.>
   (no margin glosses; the word and the index entry stay); write the gloss
   anyway: the Japanese edition's English index (`index=dual`) and a later
   edition with glosses need it.
+- Several terms defined together (a definition that introduces 2–5 terms
+  within a few lines) print one margin gloss: only the first is `\term`, the
+  others `\term!`, in both editions (the command sequence must match).  A
+  gloss identical to the word (`\term{GPU}[GPU]`) prints no margin note;
+  write it anyway, for the second index.
 - The optional first argument of `\term` is the **index sort key** and the last
   one is the **margin gloss**: `\term{Amdahl's law}[Amdahl の法則]` — never
   put `key@display` into the gloss.
@@ -281,7 +287,10 @@ it goes to the margin.
   Use `glossary.tsv` for every technical term.
 - `\term[よみ]{語}[English term]` — reading in hiragana, English gloss.
   With `index=dual` the Japanese edition also carries an English index
-  built from the glosses, so give every defining `\term` its gloss.
+  built from the glosses, so give every defining `\term` its gloss
+  (`\term!` included).  Each gloss is a margin note: in a definition with
+  several terms only the first prints a margin gloss; the others use
+  `\term!` (§3).
 - `\lessoninfo` keywords separated by `，`; items in `\source` and
   `textbook=` separated by `；`; `video={Lesson 4，動画 1--48}`; key point
   summary title `[章のまとめ]`; other chapters as `第N章`.

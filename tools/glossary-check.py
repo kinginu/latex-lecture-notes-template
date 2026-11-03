@@ -5,7 +5,8 @@
 
 Reads glossary.tsv (columns en, ja, reading, lesson, note) and every
 <lang>/lessons/NN-*.tex, parses \\term[sort]{word}[gloss] (sort and gloss
-optional) and \\term*{word}, and reports per chapter:
+optional), \\term*{word} and \\term!{word} (the quiet form, checked like
+\\term), and reports per chapter:
 
   (a) owned     a glossary term this lesson owns that is never \\term'd in it
                 (the EN form in en/, the JA form in ja/); rows whose note
@@ -105,7 +106,7 @@ def terms_in(path):
     """Yield (line, star, sort, word, gloss) for every \\term in a file."""
     text = strip_noise(open(path, encoding="utf-8").read())
     removed = [pos for pos, _ in strip_noise.removed]
-    for m in re.finditer(r"\\term(?![A-Za-z])(\*?)", text):
+    for m in re.finditer(r"\\term(?![A-Za-z])([*!]?)", text):
         i = m.end()
         sort = gloss = None
         g = group(text, i, "[", "]")

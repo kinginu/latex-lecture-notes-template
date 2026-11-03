@@ -39,8 +39,11 @@ emphasizes the word, adds it to the index, and prints a gloss in the margin
 (the Japanese term) unless the edition sets the class option
 \texttt{gloss=false}, as this English edition does.  Later mentions of a
 \term*{pipeline} use \verb|\term*| so the index does not fill up with
-repeated page numbers.  Terms can be nested: \term{speedup}[高速化率] and
-\term{Amdahl's law}[Amdahl の法則] both go to the index.
+repeated page numbers.  When one sentence or definition introduces several
+terms, only the first prints a margin gloss: \term{speedup}[高速化率] and
+\term!{Amdahl's law}[Amdahl の法則] both go to the index, but the second
+uses \verb|\term!|, which keeps the margin from crowding.  A gloss that is
+the word itself (\verb|\term{GPU}[GPU]|) prints no margin note.
 
 \begin{definition}[Speedup]
   For a change that makes a fraction $f$ of the execution time $s$ times
