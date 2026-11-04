@@ -74,7 +74,7 @@ cd <name>-notes
 make docker-build
 make docker-all          # -> en/build/main.pdf, ja/build/main.pdf
 make docker-en           # one edition
-make docker-dist         # -> dist/notes-en.pdf, dist/notes-ja.pdf
+make docker-dist         # -> dist/<repo>-en.pdf, dist/<repo>-ja.pdf
 make docker-shell        # a shell inside the container
 ```
 
@@ -106,7 +106,7 @@ recto.
 
 ```sh
 make docker-en-a5        # -> en/build/main-a5.pdf   (also ja-a5, en-b6, ...)
-make docker-print-b6     # both languages -> dist/notes-<lang>-b6.pdf
+make docker-print-b6     # both languages -> dist/<repo>-<lang>-b6.pdf
 make docker-print        # every size (a5 b6 shinsho b5)
 make docker-gray-a5      # grayscale twins of the A5 PDFs in dist/ (see below)
 tools/book-check.sh en --print a5
@@ -118,7 +118,7 @@ lists them, per size, on the Pages index; B5 is `make` only unless the book
 adds it to `PRINT_VARIANTS` (see *CI*).
 
 **Grayscale.**  `make dist` and `make print-<size>` also write a grayscale
-twin of each PDF, `dist/notes-<lang>[-<size>]-gray.pdf`, for monochrome
+twin of each PDF, `dist/<repo>-<lang>[-<size>]-gray.pdf`, for monochrome
 printing or submission (Ghostscript, every colour converted to gray, fonts
 embedded, same page size and count).  `make gray` / `make gray-<size>`
 redo only the conversion of the PDFs already in `dist/`.
@@ -261,9 +261,9 @@ words containing kanji do:
 
 ## CI
 
-`.github/workflows/build.yml` builds `dist/notes-en.pdf` and
-`dist/notes-ja.pdf` in the same TeX Live image on every push / PR, and in
-parallel the A5, B6 and 新書判 print samples (`dist/notes-<lang>-<size>.pdf`;
+`.github/workflows/build.yml` builds `dist/<repo>-en.pdf` and
+`dist/<repo>-ja.pdf` in the same TeX Live image on every push / PR, and in
+parallel the A5, B6 and 新書判 print samples (`dist/<repo>-<lang>-<size>.pdf`;
 a failed print size does not block the A4 editions), each with its
 grayscale twin (`-gray.pdf`); they are uploaded as workflow artifacts
 `pdf-<size>`.  The sizes built are the repository variable
@@ -276,8 +276,8 @@ e.g., `["a4","a5"]`, or adds `"b5"`; unset (as in the template), CI builds
 exit code in its heading; it is report-only (the job always succeeds) and
 never blocks the build or the publishing.  On every push to `main` the PDFs are
 also force-pushed to the orphan branch `pdf`, so the latest build can be
-read in the browser at `https://github.com/<owner>/<repo>/blob/pdf/notes-en.pdf`
-(and `notes-ja.pdf`) without downloading anything.  For a public repository,
+read in the browser at `https://github.com/<owner>/<repo>/blob/pdf/<repo>-en.pdf`
+(and `<repo>-ja.pdf`) without downloading anything.  For a public repository,
 enable GitHub Pages on the `pdf` branch (Settings → Pages → Deploy from a
 branch: `pdf`, `/`) and the notes are served with an index page at
 `https://<owner>.github.io/<repo>/` (its subtitle is the repository
@@ -335,7 +335,7 @@ yours; choose a license for the content in your course repository.
   （`a5`, `b6`, `shinsho` = 新書判, `b5`）。A4 の版面を縮小するだけで、
   章ファイルの変更は不要です（*Print editions* 参照）。`make dist` と
   `make print-<size>` はモノクロ提出用のグレースケール版
-  `dist/notes-<lang>[-<size>]-gray.pdf` も作ります。CI で作る判型は
+  `dist/<repo>-<lang>[-<size>]-gray.pdf` も作ります。CI で作る判型は
   リポジトリ変数 `PRINT_VARIANTS`（例 `["a4","a5"]`、`"a4"` は必須）で
   絞れます（*CI* 参照）。
 - 余白の注は自動で配置されます（`format/lnmarginfix.sty`）。注の 1 行目は
