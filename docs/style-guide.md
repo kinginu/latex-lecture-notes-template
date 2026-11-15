@@ -295,6 +295,14 @@ it goes to the margin.
 - `\term[よみ]{語}[English term]` — reading in hiragana, English gloss.
   With `index=dual` the Japanese edition also carries an English index
   built from the glosses, so give every defining `\term` its gloss.
+- **Translate the sense, not the words.**  Recurring calques to avoid:
+  「何かが得られる／何も得ない」 for *gains*, 「報われる」 for *pays off*,
+  「…が唯一のものである」 for *the only thing that*, 「到達する」 for
+  *reach (a service)*, 「代価として…を払う」 for *at the cost of*,
+  「…することができ，…することもできる」 chains, and English participial
+  clauses copied as 「…すると，…は」 with no subject.  Name the subject when
+  Japanese would leave it ambiguous.  A sentence may be split or joined, as
+  long as every macro stays with the sentence it belonged to.
 - `\lessoninfo` keywords separated by `，`; items in `\source` and
   `textbook=` separated by `；`; `video={Lesson 4，動画 1--48}`; key point
   summary title `[章のまとめ]`; other chapters as `第N章`.
