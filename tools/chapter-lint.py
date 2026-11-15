@@ -35,7 +35,8 @@ they do not change the exit status):
   section-opening  the first sentence of a \\section starts with a
              back-reference (OPENING_BACKREF, or OPENING_LATER within its
              first OPENING_REACH words or characters) or is a question;
-             skipped when its first clause has a \\cref
+             skipped when its first clause has a \\cref or names the
+             referent (named_referent)
   section-title    a \\section title equal to the chapter title or to
              another chapter's title of the edition (\\term, braces, case
              and a leading article ignored; an abbreviation with a "see:"
@@ -134,6 +135,26 @@ OPENING_LATER = {
     "ja": re.compile(rf"(そのような|これらの|この(無駄|方式|問題)|({_ORDINAL['ja']}){_GENERIC['ja']}|同じ(である|だ|に(なる|なり)))"),
 }
 OPENING_REACH = 12
+# A back-reference whose referent the same clause names: "the second
+# challenge of a many-core chip", 「メニーコアチップの第2の課題」,
+# 「2つ目の構成である RAID 1」.
+NAMED_AFTER = {
+    "en": re.compile(r"\s*(?:[\w-]+\s+)?(?:of|from)\s+\S"),
+    "ja": re.compile(rf"{_GENERIC['ja']}?である"),
+}
+# Words that may precede "the same X" when it is still the first noun phrase.
+LEADING_WORDS = {"at", "in", "on", "for", "with", "by", "under", "to", "of", "from"}
+
+
+def named_referent(lang, low, m):
+    """True when the clause of the back-reference m names what it means."""
+    if NAMED_AFTER[lang].match(low, m.end()):
+        return True
+    before = low[:m.start()]
+    if lang == "ja":
+        return bool(before) and (before.endswith("の") or m.group(0).startswith("同じ"))
+    # "the same X" after a named subject is a predicate, not a back-reference
+    return m.group(0).startswith("the same") and not set(before.split()) <= LEADING_WORDS
 QUESTION = {"en": re.compile(r"\?$"), "ja": re.compile(r"(か[．。]|だろうか[．。]?|[?？])$")}
 # Where a section's first sentence stops; group 1 names an environment.
 STOP = re.compile(r"\\(?:section|subsection|chapter)(?![A-Za-z])|"
@@ -357,8 +378,8 @@ class Lint:
                 starts = [0] + [w.end() for w in re.finditer(r"\s+", low)][:OPENING_REACH - 1]
             else:
                 starts = range(min(OPENING_REACH, len(low)))
-            hit = next(((OPENING_LATER if b else OPENING_BACKREF)[lang].match(low, b) for b in starts
-                        if (OPENING_LATER if b else OPENING_BACKREF)[lang].match(low, b)), None)
+            hits = ((OPENING_LATER if b else OPENING_BACKREF)[lang].match(low, b) for b in starts)
+            hit = next((h for h in hits if h and not named_referent(lang, low, h)), None)
             if hit:
                 ref = hit.group(0).strip()
                 self.warn(path, sline, "section-opening", f"\"{ref}\" without a named subject: {show}")
