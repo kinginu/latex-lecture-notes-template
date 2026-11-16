@@ -211,7 +211,9 @@ image), CI is the only build.
 - **Pre-push gate**: `tools/chapter-lint.py <slug>` (or `--all`) checks
   both editions of a chapter without TeX: syntax, labels, EN/JA counts,
   citations and references, `\term` against `glossary.tsv`, and the
-  recurrent style defects of style guide §3.  Run it, with
+  recurrent style defects of style guide §3; it warns (without failing)
+  about section openings and section titles that break style guide §2
+  (`section-opening`, `section-title`).  Run it, with
   `tools/parity-check.py` and `tools/glossary-check.py`, before every push.
 - **Logs**: CI uploads the artifact `build-logs` (`en/build/main.log`,
   `ja/build/main.log`, `main.toc` of both) even when the build fails:
