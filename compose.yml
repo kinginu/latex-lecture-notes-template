@@ -6,6 +6,7 @@ services:
     user: "${UID:-1000}:${GID:-1000}"
     environment:
       HOME: /home/texlive
+      REV: ${REV:-}  # the title-page revision, exported by the Makefile
     volumes:
       - .:/work
     working_dir: /work

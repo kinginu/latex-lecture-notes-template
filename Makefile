@@ -9,6 +9,7 @@
 #                                     dist/notes-<lang>[-<size>]-gray.pdf
 #                                     (dist and print-<size> make them too)
 #   make clean
+#   make rev                          print the build revision (title page)
 #   make docker-<target>              run <target> inside the container
 #   make docker-shell                 interactive shell in the container
 LATEXMK    ?= latexmk
@@ -23,6 +24,15 @@ GSFLAGS    := -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite \
               -dCompatibilityLevel=1.7 -dPDFSETTINGS=/prepress \
               -dEmbedAllFonts=true -dSubsetFonts=true -dAutoRotatePages=/None
 
+# Title-page revision: "rev 1.<commit count>" (CI: fetch-depth 0), else "draft".
+# Exported for docker-% (compose.yml): a worktree's /work mount has no repository.
+ifeq ($(strip $(REV)),)
+REV := $(or $(shell git -c safe.directory='*' rev-list --count HEAD 2>/dev/null | awk '{printf "rev 1.%03d", $$1}'),draft)
+endif
+export REV
+# One -pretex only (latexmk keeps the last), so the print targets append to it.
+PRETEX := \def\lnrevision{$(REV)}
+
 LANG_SIZES  := $(foreach l,$(LANGS),$(addprefix $(l)-,$(SIZES)))
 PRINT_SIZES := $(addprefix print-,$(SIZES))
 GRAY_SIZES  := $(addprefix gray-,$(SIZES))
@@ -30,17 +40,20 @@ GRAY_SIZES  := $(addprefix gray-,$(SIZES))
 # starts, so dist and print-<size> run them in a sub-make after the copy).
 gray_of = $(patsubst %.pdf,%-gray.pdf,$(wildcard $(1)))
 
-.PHONY: all $(LANGS) $(LANG_SIZES) $(PRINT_SIZES) $(GRAY_SIZES) print dist gray clean distclean docker-build docker-shell
+.PHONY: all rev $(LANGS) $(LANG_SIZES) $(PRINT_SIZES) $(GRAY_SIZES) print dist gray clean distclean docker-build docker-shell
 
 all: $(LANGS)
 
+rev:
+	@echo '$(REV)'
+
 $(LANGS):
-	$(LATEXMK) -cd $@/main.tex
+	$(LATEXMK) -cd -jobname=main '-pretex=$(PRETEX)' $@/main.tex
 
 # en-a5 -> latexmk -jobname=main-a5 with print=a5 passed to the class
 $(LANG_SIZES):
 	$(LATEXMK) -cd -jobname=main-$(lastword $(subst -, ,$@)) \
-	  '-pretex=\PassOptionsToClass{print=$(lastword $(subst -, ,$@))}{lnotes}' \
+	  '-pretex=$(PRETEX)\PassOptionsToClass{print=$(lastword $(subst -, ,$@))}{lnotes}' \
 	  $(firstword $(subst -, ,$@))/main.tex
 
 $(PRINT_SIZES): print-%: $(addsuffix -%,$(LANGS))

@@ -218,6 +218,7 @@ reviews → fix → translate → check → commit, per chapter),
 | `\lessoninfo{video=…, sources=…, textbook=…, keywords=…}` | info block after `\chapter` (empty keys are omitted) |
 | `marginfigure`, `margintable` | float in the margin column |
 | `widefigure`, `widetable` | float spanning body + margin (`\fullwidth`) |
+| `\coursecode{CS 6290}` | course code, top left of the title page above `\title` and the revision "rev 1.<commit count>" (set by `make` from git, else "draft"; `\revision{…}` overrides it); the cover prints nothing else: `\subtitle`, `\author`, `\date` and `\subject` are not printed (`\title` and `\author` also fill the PDF metadata) |
 | `\iflangja{ja}{en}`, `\ja{…}`, `\en{…}` | language switches for shared files |
 | `\definitionname`, `\keypointname`, `\sourcename`, … | localized strings; `\renewcommand` to change |
 

@@ -3,6 +3,8 @@
 %% Layout: single-column body on the left, a narrow margin column on the
 %% right (Tufte-style sidenotes) separated by a thin vertical rule.
 %% The title page, contents, bibliography and index span the full width.
+%% The title page (cover) prints only the course code, the title and the
+%% revision; \author etc. are kept for the PDF metadata (hyperref).
 %% An empty page follows the title page in every edition, so the contents
 %% start on page 3 (two-sided: on a recto); two-sided, the body also starts
 %% on a recto.
@@ -31,6 +33,7 @@
 %%   \sidenote{...}  \margin{...}  \source{...}  \tip{...}  \caution{...}
 %%   \term[<sort key>]{<word>}[<margin gloss>]   \term*  (no index entry)
 %%   \lessoninfo{video=..., sources=..., textbook=..., keywords=...}
+%%   \coursecode{CS 6290}  \revision{...}  title page, with \title
 %%   \definitionname, \keypointname, ... -- localized strings (renewable)
 %% Environments
 %%   definition  example  note  keypoint
@@ -290,6 +293,33 @@
     \restoregeometry% \clearpage first: the last page still has no rule
     \ln@hfwidths\global\ln@fullwidthfalse
   \fi}
+
+%% -------------------------------------------------------------- title page
+%% \maketitle: \coursecode, \title and the revision top left, in the sans
+%% face; nothing else (page style empty, no rule: titlepage environment).
+%% \revision{..} overrides the default \lnrevision (Makefile), else "draft".
+\newcommand*{\ln@coursecode}{}
+\newcommand*{\coursecode}[1]{\gdef\ln@coursecode{#1}}
+\newcommand*{\ln@revision}{\ifdefined\lnrevision\lnrevision\else draft\fi}
+\newcommand*{\revision}[1]{\gdef\ln@revision{#1}}
+%% \ln@coversize{<size>}{<skip>}: A4 point sizes, scaled for the edition
+\newcommand*{\ln@coversize}[2]{\fontsize{\ln@sdim{#1}{pt}}{\ln@sdim{#2}{pt}}\selectfont}
+\renewcommand*{\maketitle}[1][1]{%
+  \begin{titlepage}
+    \setcounter{page}{#1}%
+    \setlength{\parindent}{\z@}\setlength{\parskip}{\z@}%
+    \raggedright\sffamily
+    \ifx\ln@coursecode\@empty\else
+      {\bfseries\ln@coversize{24}{29}\ln@coursecode\par}%
+      \vspace{\ln@sdim{3}{mm}}%
+    \fi
+    {\ln@coversize{24}{29}\@title\par}%
+    \vspace{\ln@sdim{3}{mm}}%
+    {\ln@coversize{13}{16}\ln@revision\par}%
+  \end{titlepage}%
+  \global\let\@thanks\@empty
+  \setcounter{footnote}{0}}
+
 \setkomafont{disposition}{\sffamily\bfseries\color{ln-accent}}
 \setkomafont{chapterprefix}{\normalfont\sffamily\normalsize\color{ln-muted}}
 \setkomafont{chapter}{\sffamily\bfseries\LARGE\color{ln-accent}}
