@@ -41,7 +41,10 @@ if ! flock -n 8; then
 fi
 
 echo "== building $lang/main.tex${size:+ (print=$size)} ($(date +%H:%M))"
-in_container "${BOOK_MEM:-2500m}" make "$target" > "$root/.png/book-$tag.make.txt" 2>&1
+# The title-page revision is counted on the host: a worktree's /work mount
+# has no repository.
+rev=$(make -s --no-print-directory -C "$root" rev 2>/dev/null)
+in_container "${BOOK_MEM:-2500m}" make "$target" "REV=$rev" > "$root/.png/book-$tag.make.txt" 2>&1
 status=$?
 python3 "$root/tools/log-summary.py" "$root/$lang/build/$job.log" "$lang"
 clean=$?

@@ -30,7 +30,10 @@ jobs:
       matrix:
         variant: ${{ fromJSON(vars.PRINT_VARIANTS || '["a4","a5","b6","shinsho"]') }}
     steps:
+      # The full history: the title page's revision counts the commits.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Build PDFs (en, ja; colour and grayscale)
         run: |
