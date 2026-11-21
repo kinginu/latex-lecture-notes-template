@@ -218,6 +218,7 @@ reviews → fix → translate → check → commit, per chapter),
 | `\lessoninfo{video=…, sources=…, textbook=…, keywords=…}` | info block after `\chapter` (empty keys are omitted) |
 | `marginfigure`, `margintable` | float in the margin column |
 | `widefigure`, `widetable` | float spanning body + margin (`\fullwidth`) |
+| `\coursecode{CS 6290}` | course code, top left of the title page, above the revision "rev 1.<commit count>" (set by `make` from git, else "draft"; `\revision{…}` overrides it); `\subject` is the institution |
 | `\iflangja{ja}{en}`, `\ja{…}`, `\en{…}` | language switches for shared files |
 | `\definitionname`, `\keypointname`, `\sourcename`, … | localized strings; `\renewcommand` to change |
 

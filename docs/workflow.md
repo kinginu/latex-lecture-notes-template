@@ -33,6 +33,9 @@ because skipping it let real defects through.
    defaults are `gloss=false` in the English edition and `index=dual` in
    the Japanese one (the comments in each `main.tex` say why); the Japanese
    title block keeps the English `\title`, `\author` and `\subject`.
+   `\coursecode{CS 6290}` goes top left on the title page, above the
+   revision `make` counts from git (`rev 1.<commits>`); `\subject` is the
+   institution.
    Delete the two sample chapters and their `glossary.tsv` rows, and run
    `tools/sync-main.py`.
 4. Replace `README.md` with the book's own: title, links to the PDFs,
